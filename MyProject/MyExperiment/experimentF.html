@@ -411,9 +411,6 @@
       choices: "NO_KEYS", // キー入力なし
     };
 
-    // タイムラインに全試行を追加
-    const timeline = trials.flat(); // 各試行のフェイズを平坦化してタイムラインに設定
-
     // 実験の実行
     jsPsych.run([
       preload,              // 刺激のプリロード
