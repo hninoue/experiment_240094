@@ -141,22 +141,22 @@
     };
 
     // 練習試行：評定で用いる音声ファイルを抽出
-    const selectedAudioFiles = audioData.slice(5, 9); // 6番目～9番目（インデックス5～8）
+    const selectedAudioData = audioData.slice(5, 9); // 6番目～9番目（インデックス5～8）
 
     // 練習試行：評定
-    const trials = selectedAudioFiles.map((audioFile) => {
+    const trials = selectedAudioData.map((audioData) => {
       return [
         // 画面中央に「+」を提示するフェイズ
         {
           type: jsPsychHtmlKeyboardResponse,
           stimulus: '<p style="font-size: 48px; text-align: center;">+</p>',
-          choices: jsPsych.NO_KEYS, // キーボード入力を受け付けない
+          choices: "NO_KEYS", // キーボード入力を受け付けない
           trial_duration: 1000, // 1秒間「+」を表示
         },
         // 音声提示フェイズ
         {
           type: jsPsychAudioKeyboardResponse,
-          stimulus: audioFile, // 各試行ごとに異なる音声ファイルを提示
+          stimulus: audioData, // 各試行ごとに異なる音声ファイルを提示
           choices: jsPsych.NO_KEYS, // 音声再生中は入力を受け付けない
           prompt: "", // このフェイズでは追加のプロンプトはなし
           trial_ends_after_audio: true, // 音声再生終了後に自動で次のフェイズへ進む
