@@ -350,7 +350,7 @@
         stimulus: '<p>本試行を開始します。準備ができたらスペースキーを押してください。</p>',
         choices: [' '], // スペースキーで開始
       },
-      ...testTrials.flat(), // 本試行を展開して挿入
+      ...mainTrials.flat(), // 本試行を展開して挿入
       {
         type: 'html-keyboard-response',
         stimulus: '<p>本試行が終了しました。ご協力ありがとうございました。</p>',
