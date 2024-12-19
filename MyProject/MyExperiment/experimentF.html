@@ -147,21 +147,21 @@
     const practiceTrials = practiceAudioData.map((audioFile) => [
       // 注視点「+」を提示するフェイズ
       {
-        type: 'html-keyboard-response',
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p style="font-size: 48px; text-align: center;">+</p>',
         choices: "NO_KEYS",
         trial_duration: 500, // 500ms
       },
       // 音声提示フェイズ
       {
-        type: 'audio-keyboard-response',
+        type: jsPsychAudioKeyboardResponse,
         stimulus: audioFile,
         choices: "NO_KEYS",
         trial_ends_after_audio: true, // 音声終了後に次へ進む
       },
       // 評定フェイズ
       {
-        type: 'html-button-response',
+        type: jsPsychHtmlButtonResponse,
         stimulus: `
           <p style="font-size: 20px; text-align: center;">これは練習です。</p>
           <p style="font-size: 18px; text-align: center;">
@@ -180,7 +180,7 @@
             jsPsych.addNodeToEndOfTimeline({
               timeline: [
                 {
-                  type: 'html-keyboard-response',
+                  type: jsPsychHtmlKeyboardResponse,
                   stimulus: '<p style="color: red; text-align: center;">時間切れ</p>',
                   choices: "NO_KEYS",
                   trial_duration: 1000,
@@ -192,7 +192,7 @@
             jsPsych.addNodeToEndOfTimeline({
               timeline: [
                 {
-                  type: 'html-keyboard-response',
+                  type: jsPsychHtmlKeyboardResponse,
                   stimulus: '<p style="color: green; text-align: center;">OK</p>',
                   choices: "NO_KEYS",
                   trial_duration: 1000,
@@ -207,13 +207,13 @@
     // 練習試行タイムラインを定義
     const practiceTimeline = [
       {
-        type: 'html-keyboard-response',
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p>練習試行を開始します。準備ができたらスペースキーを押してください。</p>',
         choices: [' '], // スペースキーで開始
       },
       ...practiceTrials.flat(), // 練習試行を展開して挿入
       {
-        type: 'html-keyboard-response',
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p>練習試行が終了しました。本試行に進みます。</p>',
         choices: [' '], // スペースキーで次に進む
       },
@@ -269,21 +269,21 @@
     const mainTrials = mainAudioData.map((audioFile) => [
       // 注視点「+」を提示するフェイズ
       {
-        type: 'html-keyboard-response',
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p style="font-size: 48px; text-align: center;">+</p>',
         choices: "NO_KEYS",
         trial_duration: 500, // 500ms
       },
       // 音声提示フェイズ
       {
-        type: 'audio-keyboard-response',
+        type: jsPsychAudioKeyboardResponse,
         stimulus: audioFile,
         choices: "NO_KEYS",
         trial_ends_after_audio: true, // 音声終了後に次へ進む
       },
       // 評定フェイズ
       {
-        type: 'html-button-response',
+        type: jsPsychHtmlButtonResponse,
         stimulus: `
           <p style="font-size: 18px; text-align: center;">
             読み上げられた単語を、「後の記憶テストで思い出せる」に当てはまる程度を選んでください。
@@ -301,7 +301,7 @@
             jsPsych.addNodeToEndOfTimeline({
               timeline: [
                 {
-                  type: 'html-keyboard-response',
+                  type: jsPsychHtmlKeyboardResponse,
                   stimulus: '<p style="color: red; text-align: center;">時間切れ</p>',
                   choices: "NO_KEYS",
                   trial_duration: 1000,
@@ -322,7 +322,7 @@
             jsPsych.addNodeToEndOfTimeline({
               timeline: [
                 {
-                  type: 'html-keyboard-response',
+                  type: jsPsychHtmlKeyboardResponse,
                   stimulus: '<p style="color: green; text-align: center;">OK</p>',
                   choices: "NO_KEYS",
                   trial_duration: 1000,
@@ -346,13 +346,13 @@
     // 本試行のタイムライン
     const mainTimeline = [
       {
-        type: 'html-keyboard-response',
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p>本試行を開始します。準備ができたらスペースキーを押してください。</p>',
         choices: [' '], // スペースキーで開始
       },
       ...mainTrials.flat(), // 本試行を展開して挿入
       {
-        type: 'html-keyboard-response',
+        type: jsPsychHtmlKeyboardResponse,
         stimulus: '<p>本試行が終了しました。ご協力ありがとうございました。</p>',
         choices: "NO_KEYS",
       },
