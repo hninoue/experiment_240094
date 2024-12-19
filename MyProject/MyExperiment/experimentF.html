@@ -157,7 +157,7 @@
         {
           type: jsPsychAudioKeyboardResponse,
           stimulus: audioData, // 各試行ごとに異なる音声ファイルを提示
-          choices: jsPsych.NO_KEYS, // 音声再生中は入力を受け付けない
+          choices: "NO_KEYS", // 音声再生中は入力を受け付けない
           prompt: "", // このフェイズでは追加のプロンプトはなし
           trial_ends_after_audio: true, // 音声再生終了後に自動で次のフェイズへ進む
         },
