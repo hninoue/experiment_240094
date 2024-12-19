@@ -140,76 +140,90 @@
       choices: [' ']
     };
 
-    // 練習試行で使用する音声を抽出（2番目～5番目）
-    const practiceAudioData = audioData.slice(1, 5);
-
     // 練習試行の流れを構築
-    const practiceTrials = practiceAudioData.map((audioFile) => {
-      return [
-        // 注視点「+」を提示するフェイズ
-        {
-          type: jsPsychHtmlKeyboardResponse,
-          stimulus: '<p style="font-size: 48px; text-align: center;">+</p>',
-          choices: "NO_KEYS",
-          trial_duration: 500, // 500ms
-        },
-        // 音声提示フェイズ
-        {
-          type: jsPsychAudioKeyboardResponse,
-          stimulus: audioFile.file,
-          choices: "NO_KEYS",
-          trial_ends_after_audio: true, // 音声終了後に次へ進む
-        },
-        // 評定フェイズ
-        {
-          type: jsPsychHtmlButtonResponse,
-          stimulus: `
-            <p style="font-size: 20px; text-align: center;">これは練習です。</p>
-            <p style="font-size: 18px; text-align: center;">
-              読み上げられた単語を、「後の記憶テストで思い出せる」に当てはまる程度を選んでください。
-            </p>
-            <div style="text-align: center;">
-              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" alt="数直線の画像" style="max-width: 80%; height: auto;">
+    var practiceTrials = [];
+    for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
+      practiceTrials.push({
+        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        stimulus: `
+          <div>
+            <p id="fixation" style="font-size: 48px; text-align: center;">+</p> <!-- 注視点「+」 -->
+            <audio id="audio-player" src="${audioData[index].file}" autoplay style="display: none;"></audio> <!-- 音声 -->
+            <p><b>質問:</b> この音声はどの程度自然に話しているように聞こえますか？</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <img src="https://raw.githubusercontent.com/hninoue/survey_240094/main/MyProject/MySurvey/image000_scale.png" 
+                   alt="数直線" 
+                   style="max-width: 80%; height: auto;">
             </div>
-          `,
-          choices: ['1', '2', '3', '4', '5', '6'], // 評定ボタン
-          button_html: '<button class="jspsych-btn" style="font-size: 16px; margin: 5px;">%choice%</button>',
-          trial_duration: 5000, // 5秒以内
-          on_finish: function (data) {
-            data.timeout = data.response === null;
-          },
-        },
-        // フィードバックフェイズ
-        {
-          type: jsPsychHtmlKeyboardResponse,
-          stimulus: function () {
-            const lastTrial = jsPsych.data.getLastTrialData().values()[0];
-            if (lastTrial.timeout) {
-              return '<p style="color: red; text-align: center;">時間切れ</p>';
-            } else {
-              return '<p style="color: green; text-align: center;">OK</p>';
-            }
-          },
-          choices: "NO_KEYS",
-          trial_duration: 1000, // 1秒表示
-        },
-      ];
-    });
+          </div>
+        `,
+        prompt: `
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <span style="margin-right: 20px; font-weight: bold;">不自然である</span>
+            <div id="custom-button-container" style="display: flex; gap: 10px;"></div> <!-- ボタン配置 -->
+            <span style="margin-left: 20px; font-weight: bold;">自然である</span>
+          </div>
+        `,
+        choices: [], // デフォルトのボタン生成を無効化
+        on_load: function () {
+          // 注視点「+」を500ms後に非表示にする
+          const fixation = document.getElementById("fixation");
+          setTimeout(() => {
+            fixation.style.display = "none"; // 「+」を非表示にする
+            const audioPlayer = document.getElementById("audio-player");
+            audioPlayer.play(); // 音声を再生
+          }, 500); // 500ms後に音声を再生
+      
+          // ボタンを無効化
+          const buttonContainer = document.getElementById("custom-button-container");
+          const buttons = [];
+          for (let i = 0; i < 6; i++) {
+            const button = document.createElement("button");
+            button.classList.add("jspsych-btn");
+            button.innerText = i + 1; // ボタンに番号を表示
+            button.dataset.choice = i; // 選択値を設定
+            button.style.fontSize = "24px"; // 文字サイズを大きく
+            button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
+            button.style.width = "80px"; // ボタンの幅を設定
+            button.style.height = "80px"; // ボタンの高さを設定
+            button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
+            button.style.marginLeft = "15px";  // ボタンを左に15px移動
+            button.disabled = true; // 音声が再生されるまでボタンを無効化
+            button.addEventListener("click", function () {
+              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
+            });
+            buttonContainer.appendChild(button);
+            buttons.push(button); // ボタンの参照を保持
+          }
 
-    // 練習試行タイムラインを定義
-    const practiceTimeline = [
-      {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p>練習試行を開始します。準備ができたらスペースキーを押してください。</p>',
-        choices: [' '], // スペースキーで開始
-      },
-      ...practiceTrials.flat(), // 練習試行を展開して挿入
-      {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p>練習試行が終了しました。本試行に進みます。</p>',
-        choices: [' '], // スペースキーで次に進む
-      },
-    ];
+          // 音声が再生された後にボタンを有効化
+          audioPlayer.onended = function() {
+            buttons.forEach(button => {
+               button.disabled = false; // 音声終了後にボタンを有効化
+            });
+          };
+        },
+        data: {
+          audio_file: audioData[index].file, // 提示された音声ファイル名を記録
+          word: audioData[index].word, // 単語情報
+          prosody: audioData[index].prosody, // 抑揚情報
+        },
+        trial_ends_after_audio: true, // 音声が再生された後に試行を終了
+        on_finish: function(data) {
+          // 5秒以内に回答がなかった場合はタイムアウト
+          const feedbackElement = document.createElement("p");
+          feedbackElement.style.textAlign = "center";
+          if (data.response === null) {
+            feedbackElement.innerText = "時間切れ";
+            feedbackElement.style.color = "red"; // 時間切れの場合は赤色
+          } else {
+            feedbackElement.innerText = "OK";
+            feedbackElement.style.color = "green"; // 回答があれば緑色
+          }
+          document.body.appendChild(feedbackElement); // フィードバックを表示
+        }
+      });
+    }
 
     // 本試行：教示
     const mainInstruction = {
@@ -253,83 +267,6 @@
       `,
       choices: [' ']
     };
-
-    // 本試行で使用する音声を抽出（6番目～15番目）
-    const mainAudioData = audioData.slice(5, 15);
-
-    // 本試行の流れを構築
-    const mainTrials = mainAudioData.map((audioFile, index) => [
-      // 注視点「+」を提示するフェイズ
-      {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p style="font-size: 48px; text-align: center;">+</p>',
-        choices: "NO_KEYS",
-        trial_duration: 500, // 500ms
-      },
-      // 音声提示フェイズ
-      {
-        type: jsPsychAudioKeyboardResponse,
-        stimulus: audioFile,
-        choices: "NO_KEYS",
-        trial_ends_after_audio: true, // 音声終了後に次へ進む
-      },
-      // 評定フェイズ
-      {
-        type: jsPsychHtmlButtonResponse,
-        stimulus: `
-          <p style="font-size: 20px; text-align: center;">これは練習です。</p>
-          <p style="font-size: 18px; text-align: center;">
-            読み上げられた単語を、「後の記憶テストで思い出せる」に当てはまる程度を選んでください。
-          </p>
-          <div style="text-align: center;">
-            <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" alt="数直線の画像" style="max-width: 80%; height: auto;">
-          </div>
-        `,
-        choices: ['1', '2', '3', '4', '5', '6'], // 評定ボタン
-        button_html: '<button class="jspsych-btn" style="font-size: 16px; margin: 5px;">%choice%</button>',
-        trial_duration: 5000, // 5秒以内
-        on_finish: function (data) {
-          if (data.response === null) {
-            // 時間切れの処理
-            jsPsych.addNodeToEndOfTimeline({
-              timeline: [
-                {
-                  type: jsPsychHtmlKeyboardResponse,
-                  stimulus: '<p style="color: red; text-align: center;">時間切れ</p>',
-                  choices: "NO_KEYS",
-                  trial_duration: 1000,
-                  data: {
-                    phase: 'timeout', // フィードバックフェイズの識別
-                    trial_index: index + 1,
-                    audio_file: audioFile, // 提示された音声ファイル
-                    response: null, // 回答データを保存
-                    rt: null, // 反応時間（ボタンが押された時間）
-                  },
-                },
-              ],
-            });
-          }
-        },
-      },
-    ]);
-
-    // 本試行のタイムライン
-    const mainTimeline = [
-      // 開始メッセージ
-      {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p>本試行を開始します。準備ができたらスペースキーを押してください。</p>',
-        choices: [' '], // スペースキーで開始
-      },
-      // 本試行の展開
-      ...mainTrials.flat(),
-      // 終了メッセージ
-      {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<p>本試行が終了しました。ご協力ありがとうございました。</p>',
-        choices: [' '], // スペースキーで開始
-      },
-    ];
 
     // ファイル名としてsubject_idを使用
     const subject_id = jsPsych.randomization.randomID(10);
