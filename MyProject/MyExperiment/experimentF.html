@@ -157,14 +157,14 @@
         stimulus: audioData[index].file, // 音声ファイルを指定
         choices: ["1", "2", "3", "4", "5", "6"], // ボタンの選択肢
         prompt: `
-          <div>
+          <div style="text-align: center;">
             <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
             <div style="text-align: center; margin: 20px 0;">
               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
                    style="max-width: 80%; height: auto;">
             </div>
-            <div style="display: flex; align-items: center; justify-content: center;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
               <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
               <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
             </div>
@@ -177,11 +177,21 @@
           </button>
         `,
         response_ends_trial: true, // ボタン押下で試行終了
-        timeout_message: `
-          <div style="text-align: center; font-size: 24px; color: red;">
-            時間切れ（5秒以内に回答してください）
-          </div>
-        `,
+        on_finish: function(data) {
+          if (data.response === null) {
+            // 時間切れメッセージを2秒間表示
+            const timeoutMessage = document.createElement('div');
+            timeoutMessage.innerHTML = `
+              <div style="text-align: center; font-size: 24px; color: red;">
+                時間切れ（5秒以内に回答してください）
+              </div>
+            `;
+            document.body.appendChild(timeoutMessage);
+            setTimeout(() => {
+               document.body.removeChild(timeoutMessage);
+            }, 2000);
+          }
+        },
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
           word: audioData[index].word, // 単語情報
