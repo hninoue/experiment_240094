@@ -232,8 +232,15 @@
         trial_duration: 5000, // 回答時間を5秒に設定
         response_ends_trial: true, // ボタン押下で試行終了
         on_finish: function(data) {
-          // 時間切れメッセージを2秒間表示
+          // ボタンが押されたかどうかの結果を追加
           if (data.response === null) {
+            data.time_out = true; // タイムアウトのフラグを追加
+          } else {
+            data.time_out = false; // ボタンが押された場合はタイムアウトではない
+          }
+
+          // 時間切れメッセージを2秒間表示
+          if (data.time_out) {
             jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
           } else {
             jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
@@ -243,6 +250,7 @@
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
           word: audioData[index].word, // 単語情報
           prosody: audioData[index].prosody, // 抑揚情報
+          time_out: null, // 時間切れかどうかの情報（デフォルトはnull）
         },
       });
 
@@ -257,7 +265,7 @@
 
     // 注視点と音声試行を組み合わせる
     var practiceProcedure = {
-      timeline: [fixation].concat(practiceTrials), // 配列を結合
+      timeline: [fixation, timeoutMessage].concat(practiceTrials), // 配列を結合
     };
 
     // 本試行：教示
