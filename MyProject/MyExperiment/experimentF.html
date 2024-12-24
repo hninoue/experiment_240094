@@ -141,89 +141,79 @@
       choices: [' ']
     };
 
+    // 注視点
+    var fixation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: "NO_KEYS",
+      trial_duration: 500, // 500ms表示
+    };
+
     // 練習試行：操作
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
-
-      // 注視点
-      var fixation = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<div style="font-size:60px;">+</div>',
-        choices: "NO_KEYS",
-        trial_duration: 500, // 500ms表示
-      };
-
-      // 音声提示とボタン無効の状態
-      var audioAndPrompt = {
-        type: jsPsychAudioKeyboardResponse,
-        stimulus: audioData[index].file, // 音声ファイルを指定
-        prompt: `
-          <div style="text-align: center;">
-            <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
-            <div style="text-align: center; margin: 20px 0;">
-               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
-                   alt="数直線" 
-                   style="max-width: 80%; height: auto;">
-            </div>
-            <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
-              <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
-              <div style="margin: 0 10px;"> <!-- ボタンの間隔を調整 -->
-                <div style="display: flex; justify-content: center; gap: 15px;"> 
-                  <!-- ボタンを横並びに配置 -->
-                  1 2 3 4 5 6
-                </div>
-              </div>
-              <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
-            </div>
-          </div>
-        `,
-        choices: "NO_KEYS", // ボタン無効化（回答不可）
-        trial_ends_after_audio: true, // 音声終了後に次へ
-      };
-
-      // ボタン有効化後の回答
-      var responseTrial = {
-        type: jsPsychHtmlButtonResponse,
+      // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
+      practiceTrials.push({
+        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
         stimulus: `
-          <div style="text-align: center;">
+          <div>
+            <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
             <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
-            <div style="text-align: center; margin: 20px 0;">
+             <div style="text-align: center; margin: 20px 0;">
                <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
                    style="max-width: 80%; height: auto;">
             </div>
-             <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
-              <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
-              <div style="margin: 0 10px;"> <!-- ボタンの間隔を調整 -->
-                <div style="display: flex; justify-content: center; gap: 15px;"> 
-                  <!-- ボタンを横並びに配置 -->
-                  %choice_buttons%
-                </div>
-              </div>
-              <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
-            </div>
           </div>
         `,
-        choices: ["1", "2", "3", "4", "5", "6"], // 選択肢ボタン
-        button_html: `
-          <button class="jspsych-btn" style="font-size: 24px; padding: 20px; width: 80px; height: 80px; margin: 0;">
-            %choice%
-          </button>
+        prompt: `
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+            <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
+            <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
+          </div>
         `,
-        trial_duration: 5000, // 回答時間は5000ms
-        response_ends_trial: true, // ボタン押下で終了
-        on_finish: function(data) {
-          if (data.response === null) {
-            // 試行がタイムアウトした場合、次に時間切れメッセージを表示
-            jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
+        choices: [], // デフォルトのボタン生成を無効化
+        on_load: function () {
+          const audioPlayer = document.getElementById('audio-player');
+          const buttonContainer = document.getElementById("custom-button-container");
+          const buttons = [];
+
+          // ボタンを作成してボタンを無効化
+          for (let i = 0; i < 6; i++) {
+            const button = document.createElement("button");
+            button.classList.add("jspsych-btn");
+            button.innerText = i + 1; // ボタンに番号を表示
+            button.dataset.choice = i; // 選択値を設定
+            button.style.fontSize = "24px"; // 文字サイズを大きく
+            button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
+            button.style.width = "80px"; // ボタンの幅を設定
+            button.style.height = "80px"; // ボタンの高さを設定
+            button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
+            button.style.marginLeft = "15px";  // ボタンを左に15px移動
+            button.disabled = true; // 音声が再生されるまでボタンを無効化
+            button.addEventListener("click", function () {
+              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
+            });
+            buttonContainer.appendChild(button);
+            buttons.push(button); // ボタンの参照を保持
           }
+
+          // 音声が終了した後にボタンを有効化
+          audioPlayer.onended = function() {
+            buttons.forEach(button => {
+              button.disabled = false; // 音声終了後にボタンを有効化
+            });
+          };
         },
+        trial_duration: 5000, // 回答時間を5秒に設定
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
           word: audioData[index].word, // 単語情報
           prosody: audioData[index].prosody, // 抑揚情報
         },
-      };
+        trial_ends_after_audio: true  // 音声が再生された後に試行を終了
+      });
 
       // 時間切れメッセージ
       var timeoutMessage = {
@@ -237,11 +227,16 @@
         trial_duration: 2000, // 2秒間表示
       };
 
-      // 試行をタイムラインに追加
+      // 休憩用タイムラインを追加
       practiceTrials.push({
-        timeline: [fixation, audioAndPrompt, responseTrial],
+        timeline: [timeoutMessage],
       });
     }
+
+    // 注視点と音声試行を組み合わせる
+    var practiceProcedure = {
+      timeline: [fixation].concat(practiceTrials), // 配列を結合
+    };
 
     // 本試行：教示
     const mainInstruction = {
@@ -346,7 +341,7 @@
       volumeInstruction,    // 音量調整：教示
       volumeAdjustment,     // 音量調整：操作
       practiceInstruction,  // 練習試行：教示
-      practiceTrials,     // 練習試行：操作
+      practiceProcedure,     // 練習試行：操作
       mainInstruction,      // 本試行：教示
       showCode,             // 終了時のコード提示
       save_data,            // データ保存
