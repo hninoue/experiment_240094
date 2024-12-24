@@ -149,29 +149,6 @@
       trial_duration: 500, // 500ms表示
     };
 
-    // 時間切れメッセージ
-    var timeoutMessage = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: function() {
-        // もしresponseがnullなら時間切れ、それ以外ならOK
-        if (jsPsych.data.get().last(1).values()[0].response === null) {
-          return `
-            <div style="text-align: center; font-size: 24px; color: red;">
-              時間切れ<br>（5秒以内に回答してください）
-            </div>
-          `;
-        } else {
-          return `
-            <div style="text-align: center; font-size: 24px; color: green;">
-              OK
-            </div>
-          `;
-        }
-      },
-      choices: "NO_KEYS",
-      trial_duration: 2000, // 2秒間表示
-    };
-
     // 練習試行：操作
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
@@ -247,16 +224,41 @@
         }
       });
 
-      var trialWithFixation = {
-        timeline: [fixation, practiceTrials[index-1]],
+      // timeoutMessageを試行ごとに表示する
+      var trialWithTimeoutMessage = {
+        timeline: [
+          practiceTrials[index - 1], // 実際の試行
+          {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function() {
+              // もしresponseがnullなら時間切れ、それ以外ならOK
+              if (jsPsych.data.get().last(1).values()[0].response === null) {
+                return `
+                  <div style="text-align: center; font-size: 24px; color: red;">
+                    時間切れ<br>（5秒以内に回答してください）
+                  </div>
+                `;
+              } else {
+                return `
+                  <div style="text-align: center; font-size: 24px; color: green;">
+                   OK
+                  </div>
+                `;
+              }
+            },
+            choices: "NO_KEYS",
+            trial_duration: 2000, // 2秒間表示
+          },
+          fixation, // 注視点
+        ],
       };
 
-      practiceTrials[index-1] = trialWithFixation;
+      practiceTrials[index - 1] = trialWithTimeoutMessage; // 試行を更新
     }
 
-    // 最後に `timeoutMessage` を加えたタイムライン
+    // 注視点と音声試行を組み合わせる
     var practiceProcedure = {
-      timeline: [fixation].concat(practiceTrials, timeoutMessage), // 全ての試行をタイムラインに追加
+      timeline: [fixation].concat(practiceTrials), // 配列を結合
     };
 
     // 本試行：教示
