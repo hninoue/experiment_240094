@@ -218,11 +218,22 @@
       // 時間切れメッセージ
       var timeoutMessage = {
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
-          <div style="text-align: center; font-size: 24px; color: red;">
-            時間切れ（5秒以内に回答してください）
-          </div>
-        `,
+        stimulus: function() {
+          // もしresponseがnullなら時間切れ、それ以外ならOK
+          if (jsPsych.data.get().last(1).values()[0].response === null) {
+            return `
+              <div style="text-align: center; font-size: 24px; color: red;">
+                時間切れ<br>（5秒以内に回答してください）
+              </div>
+            `;
+          } else {
+            return `
+              <div style="text-align: center; font-size: 24px; color: green;">
+                OK
+              </div>
+            `;
+          }
+        },
         choices: "NO_KEYS",
         trial_duration: 2000, // 2秒間表示
       };
@@ -231,7 +242,15 @@
       practiceTrials.push({
         timeline: [timeoutMessage],
       });
+
+      // ここで、試行の前に注視点を追加することで、毎回表示されるようにします
+      var trialWithFixation = {
+        timeline: [fixation, practiceTrials[index - 1]], // 注視点とメインの試行を結合
+      };
+
+      practiceTrials[index - 1] = trialWithFixation; // 試行を更新
     }
+
 
     // 注視点と音声試行を組み合わせる
     var practiceProcedure = {
