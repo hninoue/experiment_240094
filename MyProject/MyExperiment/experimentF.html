@@ -141,35 +141,22 @@
       choices: [' ']
     };
 
-    // 消すかも？　注視点
+    // 注視点
     var fixation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<div style="font-size:60px;">+</div>',
       choices: "NO_KEYS",
-      trial_duration: 500,
+      trial_duration: 500, // 500ms表示
     };
 
     // 練習試行：操作
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
 
-      // 時間切れメッセージを表示するタイムライン
-      var timeoutMessage = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
-          <div style="text-align: center; font-size: 24px; color: red;">
-            時間切れ（5秒以内に回答してください）
-          </div>
-        `,
-        choices: "NO_KEYS",
-        trial_duration: 2000, // 2秒間表示
-      };
-
-      // メインの試行
-      var mainTrial = {
-        type: jsPsychAudioButtonResponse,
+      // 音声提示とボタン無効の状態
+      var audioAndPrompt = {
+        type: jsPsychAudioKeyboardResponse,
         stimulus: audioData[index].file, // 音声ファイルを指定
-        choices: [], // ボタンの選択肢
         prompt: `
           <div style="text-align: center;">
             <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
@@ -183,20 +170,48 @@
               <div style="margin: 0 10px;"> <!-- ボタンの間隔を調整 -->
                 <div style="display: flex; justify-content: center; gap: 15px;"> 
                   <!-- ボタンを横並びに配置 -->
+                  1 2 3 4 5 6
+                </div>
+              </div>
+              <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
+            </div>
+          </div>
+        `,
+        choices: "NO_KEYS", // ボタン無効化（回答不可）
+        trial_ends_after_audio: true, // 音声終了後に次へ
+      };
+
+      // ボタン有効化後の回答
+      var responseTrial = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus: `
+          <div style="text-align: center;">
+            <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
+            <div style="text-align: center; margin: 20px 0;">
+               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+                   alt="数直線" 
+                   style="max-width: 80%; height: auto;">
+            </div>
+             <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+              <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+              <div style="margin: 0 10px;"> <!-- ボタンの間隔を調整 -->
+                <div style="display: flex; justify-content: center; gap: 15px;"> 
+                  <!-- ボタンを横並びに配置 -->
                   %choice_buttons%
                 </div>
               </div>
               <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
             </div>
-            </div>
+          </div>
         `,
-        trial_duration: 5000, // 試行時間を5秒に制限
+        choices: ["1", "2", "3", "4", "5", "6"], // 選択肢ボタン
         button_html: `
           <button class="jspsych-btn" style="font-size: 24px; padding: 20px; width: 80px; height: 80px; margin: 0;">
             %choice%
           </button>
         `,
-        response_ends_trial: true, // ボタン押下で試行終了
+        trial_duration: 5000, // 回答時間は5000ms
+        response_ends_trial: true, // ボタン押下で終了
         on_finish: function(data) {
           if (data.response === null) {
             // 試行がタイムアウトした場合、次に時間切れメッセージを表示
@@ -210,14 +225,23 @@
         },
       };
 
-      // 試行をタイムラインに追加
-      practiceTrials.push(mainTrial);
-    }
+      // 時間切れメッセージ
+      var timeoutMessage = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+          <div style="text-align: center; font-size: 24px; color: red;">
+            時間切れ（5秒以内に回答してください）
+          </div>
+        `,
+        choices: "NO_KEYS",
+        trial_duration: 2000, // 2秒間表示
+      };
 
-    // 消すかも?　タイムライン
-    var practiceProcedure = {
-      timeline: [fixation].concat(practiceTrials), // 配列を結合
-    };
+      // 試行をタイムラインに追加
+      practiceTrials.push({
+        timeline: [fixation, audioAndPrompt, responseTrial],
+      });
+    }
 
     // 本試行：教示
     const mainInstruction = {
