@@ -152,7 +152,21 @@
     // 練習試行：操作
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
-      practiceTrials.push({
+
+      // 時間切れメッセージを表示するタイムライン
+      var timeoutMessage = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+          <div style="text-align: center; font-size: 24px; color: red;">
+            時間切れ（5秒以内に回答してください）
+          </div>
+        `,
+        choices: "NO_KEYS",
+        trial_duration: 2000, // 2秒間表示
+      };
+
+      // メインの試行
+      var mainTrial = {
         type: jsPsychAudioButtonResponse,
         stimulus: audioData[index].file, // 音声ファイルを指定
         choices: ["1", "2", "3", "4", "5", "6"], // ボタンの選択肢
@@ -160,36 +174,33 @@
           <div style="text-align: center;">
             <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
             <div style="text-align: center; margin: 20px 0;">
-              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
                    style="max-width: 80%; height: auto;">
             </div>
             <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
               <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+              <div style="margin: 0 10px;"> <!-- ボタンの間隔を調整 -->
+                <div style="display: flex; justify-content: center; gap: 15px;"> 
+                  <!-- ボタンを横並びに配置 -->
+                  %choice_buttons%
+                </div>
+              </div>
               <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
             </div>
-          </div>
+            </div>
         `,
         trial_duration: 5000, // 試行時間を5秒に制限
         button_html: `
-          <button class="jspsych-btn" style="font-size: 24px; padding: 20px; width: 80px; height: 80px; margin: 0 15px;">
+          <button class="jspsych-btn" style="font-size: 24px; padding: 20px; width: 80px; height: 80px; margin: 0;">
             %choice%
           </button>
         `,
         response_ends_trial: true, // ボタン押下で試行終了
         on_finish: function(data) {
           if (data.response === null) {
-            // 時間切れメッセージを2秒間表示
-            const timeoutMessage = document.createElement('div');
-            timeoutMessage.innerHTML = `
-              <div style="text-align: center; font-size: 24px; color: red;">
-                時間切れ（5秒以内に回答してください）
-              </div>
-            `;
-            document.body.appendChild(timeoutMessage);
-            setTimeout(() => {
-               document.body.removeChild(timeoutMessage);
-            }, 2000);
+            // 試行がタイムアウトした場合、次に時間切れメッセージを表示
+            jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
           }
         },
         data: {
@@ -197,8 +208,8 @@
           word: audioData[index].word, // 単語情報
           prosody: audioData[index].prosody, // 抑揚情報
         },
-      });
-    }
+      };
+    }  
 
     // 消すかも?　タイムライン
     var practiceProcedure = {
