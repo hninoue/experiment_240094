@@ -148,17 +148,17 @@
       trial_duration: 500,
     };
 
-    // 練習試行の流れを構築
+    // 練習試行：操作
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
       practiceTrials.push({
-        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        type: jsPsychCategorizeHtml, // CategorizeHtmlプラグインを使用
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
             <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
             <div style="text-align: center; margin: 20px 0;">
-              <img src="https://raw.githubusercontent.com/hninoue/survey_240094/main/MyProject/MySurvey/image000_scale.png" 
+              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
                    style="max-width: 80%; height: auto;">
             </div>
@@ -166,16 +166,26 @@
         `,
         prompt: `
           <div style="display: flex; align-items: center; justify-content: center;">
-            <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+            <span style="margin-right: 20px; font-weight: bold;">不自然である</span>
             <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
-            <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
+            <span style="margin-left: 20px; font-weight: bold;">自然である</span>
           </div>
         `,
         choices: [], // デフォルトのボタン生成を無効化
-        on_load: function () {
+        key_answer: null, // 正解は必要ないため設定しない
+        correct_text: "", // 正解メッセージは表示しない
+        incorrect_text: "", // 不正解メッセージも表示しない
+        show_feedback_on_timeout: true, // タイムアウト時にメッセージを表示
+        timeout_message: `
+          <div style="text-align: center; font-size: 24px; color: red;">
+            時間切れ（5秒以内に回答してください）
+          </div>
+        `,
+        trial_duration: 5000, // 試行時間を5秒に制限
+        on_load: function() {
           // 音声が準備できたら試行を開始
           const audioPlayer = document.getElementById('audio-player');
-  
+      
           // ボタンを無効化
           const buttonContainer = document.getElementById("custom-button-container");
           const buttons = [];
@@ -189,14 +199,10 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
+            button.style.marginLeft = "15px";  // ボタンを左に15px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
-              clearTimeout(timeoutId); // タイムアウトをキャンセル
-              jsPsych.finishTrial({ 
-                response: parseInt(this.dataset.choice), 
-                feedback: "OK", 
-                feedback_color: "green" 
-              });
+              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
             });
             buttonContainer.appendChild(button);
             buttons.push(button); // ボタンの参照を保持
@@ -207,29 +213,7 @@
             buttons.forEach(button => {
               button.disabled = false; // 音声終了後にボタンを有効化
             });
-        
-            // タイムアウト処理
-            timeoutId = setTimeout(function() {
-              jsPsych.finishTrial({ 
-                response: null, 
-                feedback: "時間切れ", 
-                feedback_color: "red" 
-              });
-            }, 5000); // 5秒後にタイムアウト
           };
-        },
-        on_finish: function(data) {
-          // フィードバックを表示
-          jsPsych.data.get().addToLast({
-            feedback: data.feedback,
-            feedback_color: data.feedback_color
-          });
-
-          document.body.innerHTML = `
-            <div style="text-align: center; font-size: 24px; color: ${data.feedback_color};">
-              ${data.feedback}
-            </div>
-          `;
         },
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
@@ -238,6 +222,7 @@
         }
       });
     }
+
     // 消すかも?　タイムライン
     var practiceProcedure = {
       timeline: [fixation, practiceTrials],
