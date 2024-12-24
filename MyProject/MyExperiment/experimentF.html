@@ -140,6 +140,14 @@
       choices: [' ']
     };
 
+    // 消すかも？　注視点
+    var fixation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: "NO_KEYS",
+      trial_duration: 500,
+    };
+
     // 練習試行の流れを構築
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
@@ -147,9 +155,8 @@
         type: jsPsychHtmlButtonResponse, // 一つの画面で提示
         stimulus: `
           <div>
-            <p id="fixation" style="font-size: 48px; text-align: center;">+</p> <!-- 注視点「+」 -->
-            <audio id="audio-player" src="${audioData[index].file}" autoplay style="display: none;"></audio> <!-- 音声 -->
-            <p><b>質問:</b> この音声はどの程度自然に話しているように聞こえますか？</p>
+            <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
+            <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
             <div style="text-align: center; margin: 20px 0;">
               <img src="https://raw.githubusercontent.com/hninoue/survey_240094/main/MyProject/MySurvey/image000_scale.png" 
                    alt="数直線" 
@@ -159,21 +166,16 @@
         `,
         prompt: `
           <div style="display: flex; align-items: center; justify-content: center;">
-            <span style="margin-right: 20px; font-weight: bold;">不自然である</span>
-            <div id="custom-button-container" style="display: flex; gap: 10px;"></div> <!-- ボタン配置 -->
-            <span style="margin-left: 20px; font-weight: bold;">自然である</span>
+            <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+            <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
+            <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
           </div>
         `,
         choices: [], // デフォルトのボタン生成を無効化
         on_load: function () {
-          // 注視点「+」を500ms後に非表示にする
-          const fixation = document.getElementById("fixation");
-          setTimeout(() => {
-            fixation.style.display = "none"; // 「+」を非表示にする
-            const audioPlayer = document.getElementById("audio-player");
-            audioPlayer.play(); // 音声を再生
-          }, 500); // 500ms後に音声を再生
-      
+          // 音声が準備できたら試行を開始
+          const audioPlayer = document.getElementById('audio-player');
+  
           // ボタンを無効化
           const buttonContainer = document.getElementById("custom-button-container");
           const buttons = [];
@@ -187,10 +189,14 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "15px";  // ボタンを左に15px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
-              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
+              clearTimeout(timeoutId); // タイムアウトをキャンセル
+              jsPsych.finishTrial({ 
+                response: parseInt(this.dataset.choice), 
+                feedback: "OK", 
+                feedback_color: "green" 
+              });
             });
             buttonContainer.appendChild(button);
             buttons.push(button); // ボタンの参照を保持
@@ -199,31 +205,43 @@
           // 音声が再生された後にボタンを有効化
           audioPlayer.onended = function() {
             buttons.forEach(button => {
-               button.disabled = false; // 音声終了後にボタンを有効化
+              button.disabled = false; // 音声終了後にボタンを有効化
             });
+        
+            // タイムアウト処理
+            timeoutId = setTimeout(function() {
+              jsPsych.finishTrial({ 
+                response: null, 
+                feedback: "時間切れ", 
+                feedback_color: "red" 
+              });
+            }, 5000); // 5秒後にタイムアウト
           };
+        },
+        on_finish: function(data) {
+          // フィードバックを表示
+          jsPsych.data.get().addToLast({
+            feedback: data.feedback,
+            feedback_color: data.feedback_color
+          });
+
+          document.body.innerHTML = `
+            <div style="text-align: center; font-size: 24px; color: ${data.feedback_color};">
+              ${data.feedback}
+            </div>
+          `;
         },
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
           word: audioData[index].word, // 単語情報
           prosody: audioData[index].prosody, // 抑揚情報
-        },
-        trial_ends_after_audio: true, // 音声が再生された後に試行を終了
-        on_finish: function(data) {
-          // 5秒以内に回答がなかった場合はタイムアウト
-          const feedbackElement = document.createElement("p");
-          feedbackElement.style.textAlign = "center";
-          if (data.response === null) {
-            feedbackElement.innerText = "時間切れ";
-            feedbackElement.style.color = "red"; // 時間切れの場合は赤色
-          } else {
-            feedbackElement.innerText = "OK";
-            feedbackElement.style.color = "green"; // 回答があれば緑色
-          }
-          document.body.appendChild(feedbackElement); // フィードバックを表示
         }
       });
     }
+    // 消すかも?　タイムライン
+    var practiceProcedure = {
+      timeline: [fixation, practiceTrials],
+    };
 
     // 本試行：教示
     const mainInstruction = {
@@ -328,9 +346,8 @@
       volumeInstruction,    // 音量調整：教示
       volumeAdjustment,     // 音量調整：操作
       practiceInstruction,  // 練習試行：教示
-      practiceTimeline,     // 練習試行：操作
+      practiceProcedure,     // 練習試行：操作
       mainInstruction,      // 本試行：教示
-      mainTimeline,         // 本試行：操作
       showCode,             // 終了時のコード提示
       save_data,            // データ保存
       finalMessage          // 最後のメッセージ
