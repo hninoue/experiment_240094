@@ -223,7 +223,7 @@
       });
 
       // timeoutMessageを試行ごとに表示する
-      var trialWithTimeoutMessage = {
+      var practiceTimeoutMessage = {
         timeline: [
           practiceTrials[index - 1], // 実際の試行
           {
@@ -251,7 +251,7 @@
         ],
       };
 
-      practiceTrials[index - 1] = trialWithTimeoutMessage; // 試行を更新
+      practiceTrials[index - 1] = practiceTimeoutMessage; // 試行を更新
     }
 
     // 注視点と音声試行を組み合わせる
@@ -282,24 +282,134 @@
         <ul>
           <li>
             <b>留意事項１:</b><br>
-            <span style="color: pink;">思い出せそうである場合</span>は
-            <span style="color: pink;">大きい数字</span>を選択してください。<br>
-            <span style="color: lightblue;">思い出せそうでない場合</span>は
-            <span style="color: lightblue;">小さい数字</span>を選択してください。
+            <span style="color: #D5006C;">思い出せそうである場合</span>は
+            <span style="color: #D5006C;">大きい数字</span>を選択してください。<br>
+            <span style="color: #0277BD;">思い出せそうでない場合</span>は
+            <span style="color: #0277BD;">小さい数字</span>を選択してください。
           </li>
           <li>
             <b>留意事項２:</b><br>
             画面は自動で切り替わります。<br>
-            <span style="color: yellow;">5秒以内に</span>「1」から「6」の
-            <span style="color: yellow;">四角で囲まれた数字</span>のうち1つをクリック/タッチしてください。<br>
-            なお、5秒以内に選択できれば「<span style="color: green;">OK</span>」、<br>
-            選択できていなければ「<span style="color: red;">時間切れ</span>」と表示されます。
+            <span style="color: #FF5722;">5秒以内に</span>、「1」から「6」のうち該当する1つをクリックしてください。<br>
+            なお、5秒以内に選択できれば「<span style="color: green;">OK</span>」、そうでなければ「<span style="color: red;">時間切れ</span>」と表示されます。
           </li>
         </ul>
         <br><br>
         <b>上記の内容について理解できましたら、スペースキーを押してください（本試行へ）</b>
       `,
       choices: [' ']
+    };
+
+    // 本試行：操作
+    var mainTrials = [];
+    for (let index = 5; index < audioData.length; index++) { // 2番目から5番目の音声を使用
+      // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
+      mainTrials.push({
+        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        stimulus: `
+          <div>
+            <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
+            <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
+             <div style="text-align: center; margin: 20px 0;">
+               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+                   alt="数直線" 
+                   style="max-width: 80%; height: auto;">
+            </div>
+          </div>
+        `,
+        prompt: `
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+            <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
+            <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
+          </div>
+        `,
+        choices: [], // デフォルトのボタン生成を無効化
+        on_load: function () {
+          const audioPlayer = document.getElementById('audio-player');
+          const buttonContainer = document.getElementById("custom-button-container");
+          const buttons = [];
+
+          // ボタンを作成してボタンを無効化
+          for (let i = 0; i < 6; i++) {
+            const button = document.createElement("button");
+            button.classList.add("jspsych-btn");
+            button.innerText = i + 1; // ボタンに番号を表示
+            button.dataset.choice = i; // 選択値を設定
+            button.style.fontSize = "24px"; // 文字サイズを大きく
+            button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
+            button.style.width = "80px"; // ボタンの幅を設定
+            button.style.height = "80px"; // ボタンの高さを設定
+            button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
+            button.style.marginLeft = "15px";  // ボタンを左に15px移動
+            button.disabled = true; // 音声が再生されるまでボタンを無効化
+            button.addEventListener("click", function () {
+              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
+            });
+            buttonContainer.appendChild(button);
+            buttons.push(button); // ボタンの参照を保持
+          }
+
+          // 音声が終了した後にボタンを有効化
+          audioPlayer.onended = function() {
+            buttons.forEach(button => {
+              button.disabled = false; // 音声終了後にボタンを有効化
+            });
+          };
+        },
+        trial_duration: 5000, // 回答時間を5秒に設定
+        response_ends_trial: true, // ボタン押下で試行終了
+        data: {
+          audio_file: audioData[index].file, // 提示された音声ファイル名を記録
+          word: audioData[index].word, // 単語情報
+          prosody: audioData[index].prosody, // 抑揚情報
+          time_out: null, // 時間切れかどうかの情報（デフォルトはnull）
+        },
+        on_finish: function(data) {
+          // ボタンが押されたかどうかの結果を追加
+          if (data.response === null) {
+            data.time_out = true; // タイムアウトのフラグを追加
+          } else {
+            data.time_out = false; // ボタンが押された場合はタイムアウトではない
+          }
+        }
+      });
+
+      // timeoutMessageを試行ごとに表示する
+      var mainTimeoutMessage = {
+        timeline: [
+          mainTrials[index - 1], // 実際の試行
+          {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: function() {
+              // もしresponseがnullなら時間切れ、それ以外ならOK
+              if (jsPsych.data.get().last(1).values()[0].response === null) {
+                return `
+                  <div style="text-align: center; font-size: 24px; color: red;">
+                    時間切れ<br>（5秒以内に回答してください）
+                  </div>
+                `;
+              } else {
+                return `
+                  <div style="text-align: center; font-size: 24px; color: green;">
+                   OK
+                  </div>
+                `;
+              }
+            },
+            choices: "NO_KEYS",
+            trial_duration: 2000, // 2秒間表示
+          },
+          fixation, // 注視点
+        ],
+      };
+
+      mainTrials[index - 1] = mainTimeoutMessage; // 試行を更新
+    }
+
+    // 注視点と音声試行を組み合わせる
+    var mainProcedure = {
+      timeline: [fixation].concat(mainTrials), // 配列を結合
     };
 
     // ファイル名としてsubject_idを使用
@@ -362,8 +472,9 @@
       volumeInstruction,    // 音量調整：教示
       volumeAdjustment,     // 音量調整：操作
       practiceInstruction,  // 練習試行：教示
-      practiceProcedure,     // 練習試行：操作
+      practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
+      mainProcedure,        // 本試行：操作
       showCode,             // 終了時のコード提示
       save_data,            // データ保存
       finalMessage          // 最後のメッセージ
