@@ -156,7 +156,7 @@
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
-            <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
+            <p><b>質問:</b> 読み上げられた単語について、<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
              <div style="text-align: center; margin: 20px 0;">
                <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
@@ -302,14 +302,14 @@
 
     // 本試行：操作
     var mainTrials = [];
-    for (let index = 5; index < audioData.length; index++) { // 2番目から5番目の音声を使用
+    for (let index = 5; index < audioData.length; index++) { // 6番目以降の音声を使用
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       mainTrials.push({
         type: jsPsychHtmlButtonResponse, // 一つの画面で提示
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
-            <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
+            <p><b>質問:</b> 読み上げられた単語について、<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
              <div style="text-align: center; margin: 20px 0;">
                <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
