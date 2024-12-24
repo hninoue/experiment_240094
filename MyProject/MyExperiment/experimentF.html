@@ -230,7 +230,7 @@
           };
         },
         trial_duration: 5000, // 回答時間を5秒に設定
-        response_ends_trial: true, // ボタン押下で試行終了
+        response_ends_trial: false, // ボタン押下で試行終了
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
           word: audioData[index].word, // 単語情報
@@ -275,6 +275,11 @@
       };
 
       practiceTrials[index-1] = trialWithFixation; // 試行を更新
+    }
+
+    // 注視点と音声試行を組み合わせる
+    var practiceProcedure = {
+      timeline: [fixation].concat(practiceTrials), // 配列を結合
     };
 
     // 本試行：教示
