@@ -153,74 +153,40 @@
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
       practiceTrials.push({
-        type: jsPsychCategorizeHtml, // CategorizeHtmlプラグインを使用
-        stimulus: `
+        type: jsPsychAudioButtonResponse,
+        stimulus: audioData[index].file, // 音声ファイルを指定
+        choices: ["1", "2", "3", "4", "5", "6"], // ボタンの選択肢
+        prompt: `
           <div>
-            <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
             <p><b>質問:</b> 読み上げられた単語について，<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
             <div style="text-align: center; margin: 20px 0;">
               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
                    alt="数直線" 
                    style="max-width: 80%; height: auto;">
             </div>
+            <div style="display: flex; align-items: center; justify-content: center;">
+              <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
+              <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
+            </div>
           </div>
         `,
-        prompt: `
-          <div style="display: flex; align-items: center; justify-content: center;">
-            <span style="margin-right: 20px; font-weight: bold;">不自然である</span>
-            <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
-            <span style="margin-left: 20px; font-weight: bold;">自然である</span>
-          </div>
+        trial_duration: 5000, // 試行時間を5秒に制限
+        button_html: `
+          <button class="jspsych-btn" style="font-size: 24px; padding: 20px; width: 80px; height: 80px; margin: 0 15px;">
+            %choice%
+          </button>
         `,
-        choices: [], // デフォルトのボタン生成を無効化
-        key_answer: null, // 正解は必要ないため設定しない
-        correct_text: "", // 正解メッセージは表示しない
-        incorrect_text: "", // 不正解メッセージも表示しない
-        show_feedback_on_timeout: true, // タイムアウト時にメッセージを表示
+        response_ends_trial: true, // ボタン押下で試行終了
         timeout_message: `
           <div style="text-align: center; font-size: 24px; color: red;">
             時間切れ（5秒以内に回答してください）
           </div>
         `,
-        trial_duration: 5000, // 試行時間を5秒に制限
-        on_load: function() {
-          // 音声が準備できたら試行を開始
-          const audioPlayer = document.getElementById('audio-player');
-      
-          // ボタンを無効化
-          const buttonContainer = document.getElementById("custom-button-container");
-          const buttons = [];
-          for (let i = 0; i < 6; i++) {
-            const button = document.createElement("button");
-            button.classList.add("jspsych-btn");
-            button.innerText = i + 1; // ボタンに番号を表示
-            button.dataset.choice = i; // 選択値を設定
-            button.style.fontSize = "24px"; // 文字サイズを大きく
-            button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
-            button.style.width = "80px"; // ボタンの幅を設定
-            button.style.height = "80px"; // ボタンの高さを設定
-            button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "15px";  // ボタンを左に15px移動
-            button.disabled = true; // 音声が再生されるまでボタンを無効化
-            button.addEventListener("click", function () {
-              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
-            });
-            buttonContainer.appendChild(button);
-            buttons.push(button); // ボタンの参照を保持
-          }
-
-          // 音声が再生された後にボタンを有効化
-          audioPlayer.onended = function() {
-            buttons.forEach(button => {
-              button.disabled = false; // 音声終了後にボタンを有効化
-            });
-          };
-        },
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
           word: audioData[index].word, // 単語情報
           prosody: audioData[index].prosody, // 抑揚情報
-        }
+        },
       });
     }
 
