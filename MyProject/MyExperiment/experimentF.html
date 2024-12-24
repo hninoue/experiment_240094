@@ -246,7 +246,7 @@
           }
 
           // 時間切れメッセージを2秒間表示
-          jsPsych.addNodeToEndOfTimeline({
+          var timeoutMsg = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: function() {
               if (data.time_out) {
@@ -265,14 +265,16 @@
             },
             choices: "NO_KEYS",
             trial_duration: 2000, // 2秒間表示
-          });
-        }
-      });
+            on_finish: function() {
+              // 次の試行に進む
+              jsPsych.resumeTimeline();
+            }
+          };
 
-      // 休憩用タイムラインを追加
-      practiceTrials.push({
-        timeline: [timeoutMessage],
-      });
+          // タイムアウトメッセージをタイムラインに追加
+          jsPsych.addNodeToEndOfTimeline(timeoutMsg);
+        }
+    });
 
       // ここで、試行の前に注視点を追加することで、毎回表示されるようにします
       var trialWithFixation = {
@@ -280,7 +282,7 @@
       };
 
       practiceTrials[index-1] = trialWithFixation; // 試行を更新
-    }
+    };
 
     // 注視点と音声試行を組み合わせる
     var practiceProcedure = {
