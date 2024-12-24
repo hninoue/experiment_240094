@@ -240,11 +240,7 @@
           }
 
           // 時間切れメッセージを2秒間表示
-          if (data.time_out) {
-            jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
-          } else {
-            jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
-          }
+          jsPsych.addNodeToEndOfTimeline({ timeline: [timeoutMessage] });
         },
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
