@@ -141,17 +141,17 @@
       choices: [' ']
     };
 
-    // 注視点
-    var fixation = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: '<div style="font-size:60px;">+</div>',
-      choices: "NO_KEYS",
-      trial_duration: 500, // 500ms表示
-    };
-
     // 練習試行：操作
     var practiceTrials = [];
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
+
+      // 注視点
+      var fixation = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<div style="font-size:60px;">+</div>',
+        choices: "NO_KEYS",
+        trial_duration: 500, // 500ms表示
+      };
 
       // 音声提示とボタン無効の状態
       var audioAndPrompt = {
@@ -346,7 +346,7 @@
       volumeInstruction,    // 音量調整：教示
       volumeAdjustment,     // 音量調整：操作
       practiceInstruction,  // 練習試行：教示
-      practiceProcedure,     // 練習試行：操作
+      practiceTrials,     // 練習試行：操作
       mainInstruction,      // 本試行：教示
       showCode,             // 終了時のコード提示
       save_data,            // データ保存
