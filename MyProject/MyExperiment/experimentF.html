@@ -140,7 +140,7 @@
     };
 
     // 注視点
-    var fixation = {
+    var practiceFixation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<div style="font-size:60px;">+</div>',
       choices: "NO_KEYS",
@@ -247,7 +247,7 @@
             choices: "NO_KEYS",
             trial_duration: 2000, // 2秒間表示
           },
-          fixation, // 注視点
+          practiceFixation, // 注視点
         ],
       };
 
@@ -256,7 +256,7 @@
 
     // 注視点と音声試行を組み合わせる
     var practiceProcedure = {
-      timeline: [fixation].concat(practiceTrials), // 配列を結合
+      timeline: [practiceFixation].concat(practiceTrials), // 配列を結合
     };
 
     // 本試行：教示
@@ -298,6 +298,14 @@
         <b>上記の内容について理解できましたら、スペースキーを押してください（本試行へ）</b>
       `,
       choices: [' ']
+    };
+
+    // 注視点
+    var mainFixation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: "NO_KEYS",
+      trial_duration: 500, // 500ms表示
     };
 
     // 本試行：操作
@@ -400,7 +408,7 @@
             choices: "NO_KEYS",
             trial_duration: 2000, // 2秒間表示
           },
-          fixation, // 注視点
+          mainFixation, // 注視点
         ],
       };
 
@@ -409,7 +417,7 @@
 
     // 注視点と音声試行を組み合わせる
     var mainProcedure = {
-      timeline: [fixation].concat(mainTrials), // 配列を結合
+      timeline: [mainFixation].concat(mainTrials), // 配列を結合
     };
 
     // ファイル名としてsubject_idを使用
