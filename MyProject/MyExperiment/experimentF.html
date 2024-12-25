@@ -139,7 +139,7 @@
       choices: [' ']
     };
 
-    // 注視点
+    // 練習試行：注視点
     var practiceFixation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<div style="font-size:60px;">+</div>',
@@ -300,7 +300,7 @@
       choices: [' ']
     };
 
-    // 注視点
+    // 本試行：注視点
     var mainFixation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: '<div style="font-size:60px;">+</div>',
@@ -310,7 +310,7 @@
 
     // 本試行：操作
     var mainTrials = [];
-    for (let index = 5; index < audioData.length; index++) { // 6番目以降の音声を使用
+    for (let index = 6; index < audioData.length; index++) { // 6番目以降の音声を使用
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       mainTrials.push({
         type: jsPsychHtmlButtonResponse, // 一つの画面で提示
@@ -380,13 +380,13 @@
           } else {
             data.time_out = false; // ボタンが押された場合はタイムアウトではない
           }
-        }
+        },
       });
 
       // timeoutMessageを試行ごとに表示する
       var mainTimeoutMessage = {
         timeline: [
-          mainTrials[index - 1], // 実際の試行
+          mainTrials[index - 6], // 実際の試行
           {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: function() {
@@ -412,7 +412,7 @@
         ],
       };
 
-      mainTrials[index - 1] = mainTimeoutMessage; // 試行を更新
+      mainTrials[index - 6] = mainTimeoutMessage; // 試行を更新
     }
 
     // 注視点と音声試行を組み合わせる
