@@ -110,7 +110,7 @@
         </p>
         <p style="text-align: left;">
           単語の読み上げが終わり、画面が切り替わりましたら、<br>
-          「この後の記憶テストで思い出せる」に当てはまる程度を、<br>
+          <span style="font-weight: bold;">「この後の記憶テストで思い出せる」に当てはまる程度</span>を、<br>
           「1:当てはまらない」から「6:当てはまる」の6段階で判断してください。
         </p>
         <style>
@@ -156,11 +156,14 @@
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
-            <p><b>質問:</b> 読み上げられた単語について、<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
-             <div style="text-align: center; margin: 20px 0;">
-               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
-                   alt="数直線" 
-                   style="max-width: 80%; height: auto;">
+            <p>
+              <b>質問:</b> 読み上げられた単語について、<br>
+              <span style="font-size: 24px; font-weight: bold; color: red;">「後の記憶テストで思い出せる」に当てはまる程度</span>を選んでください。
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+                  alt="数直線" 
+                  style="max-width: 80%; height: auto;">
             </div>
           </div>
         `,
@@ -271,7 +274,7 @@
         </p>
         <p style="text-align: left;">
           単語の読み上げが終わり、画面が切り替わりましたら、<br>
-          「この後の記憶テストで思い出せる」に当てはまる程度を、<br>
+          <span style="font-weight: bold;">「この後の記憶テストで思い出せる」に当てはまる程度</span>を、<br>
           「1:当てはまらない」から「6:当てはまる」の6段階で判断してください。
         </p>
         <style>
@@ -317,11 +320,14 @@
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
-            <p><b>質問:</b> 読み上げられた単語について、<br>「後の記憶テストで思い出せる」に当てはまる程度を選んでください。</p>
-             <div style="text-align: center; margin: 20px 0;">
-               <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
-                   alt="数直線" 
-                   style="max-width: 80%; height: auto;">
+            <p>
+              <b>質問:</b> 読み上げられた単語について、<br>
+              <span style="font-size: 24px; font-weight: bold; color: red;">「後の記憶テストで思い出せる」に当てはまる程度</span>を選んでください。
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+                  alt="数直線" 
+                  style="max-width: 80%; height: auto;">
             </div>
           </div>
         `,
@@ -465,10 +471,16 @@
       stimulus: `
         <p style="text-align: left;">改めまして、</p>
         <p style="text-align: left;">実験にご協力くださり誠にありがとうございました。</p>
-        <p style="text-align: left;"><b>下記のURLをコピーして、新しいブラウザを開き、URLを貼り付けてください。</b></p>
-        <p style="text-align: left;">＊URLは、謝礼を送るのに必要な情報を記入していただくGoogleフォームにつながっています。</p>
-        <br><br><p>https://forms.gle/zpzJ2A69Fo2G4VNL9</p>
-        <br><br><b>上記の手順を終えましたら、こちらのブラウザを閉じてください。</b>
+        <p style="text-align: left;"><b>下記のリンクをクリックしてください。</b></p>
+        <p style="text-align: left;">＊リンクは、謝礼を送るのに必要な情報を記入していただくGoogleフォームにつながっています。</p>
+        <br><br>
+        <p style="text-align: center;">
+          <a href="https://forms.gle/zpzJ2A69Fo2G4VNL9" target="_blank" style="font-size: 18px; color: blue; text-decoration: underline;">
+            https://forms.gle/zpzJ2A69Fo2G4VNL9
+          </a>
+        </p>
+        <br><br>
+        <b>リンクを開いた後、こちらのブラウザを閉じてください。</b>
       `,
       choices: "NO_KEYS", // キー入力なし
     };
