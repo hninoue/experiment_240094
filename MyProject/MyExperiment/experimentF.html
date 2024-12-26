@@ -436,9 +436,9 @@
         <div>
           <p>先ほど聞いた単語を、</p>
           <p>できるかぎりたくさん思い出し、</p>
-          <p> <span style="font-size: 24px; font-weight: bold;">5文字のひらがなで入力してください。</span></p>
-          <p> <span style="font-size: 24px; font-weight: bold;">1つの回答欄につき、1つの回答を入力して、</span></p>
-          <p> <span style="font-size: 24px; font-weight: bold;">Enterキーを押してください（制限時間:10分)。</span></p>
+          <p> <span style="font-weight: bold;">5文字のひらがなで入力してください。</span></p>
+          <p> <span style="font-weight: bold;">1つの回答欄につき、1つの回答を入力して、</span></p>
+          <p> <span style="font-weight: bold;">Enterキーを押してください（制限時間:10分)。</span></p>
         </div>
         <input id="response-box" type="text" style="width: 100%; padding: 10px;" autocomplete="off" autofocus>
       `,
@@ -466,6 +466,11 @@
         data.responses = responses; // 試行終了時に収集したデータを保存
       }
     };
+
+    // タイムラインを設定
+    var timeline = [];
+    timeline.push(mainProcedure); // 本試行
+    timeline.push(testTrial); // 自由再生試行
 
     // ファイル名としてsubject_idを使用
     const subject_id = jsPsych.randomization.randomID(10);
