@@ -190,7 +190,7 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "20px";  // ボタンを左に15px移動
+            button.style.marginLeft = "25px";  // ボタンを左25px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -311,7 +311,7 @@
 
     // 本試行：操作
     var mainTrials = [];
-    for (let index = 5; index < audioData.length; index++) { // 6番目以降の音声を使用
+    for (let index = 5; index < 15; index++) { // 6番目以降の音声を使用
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       mainTrials.push({
         type: jsPsychHtmlButtonResponse, // 一つの画面で提示
@@ -353,7 +353,7 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "20px";  // ボタンを左に15px移動
+            button.style.marginLeft = "25px";  // ボタンを左に25px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -453,11 +453,6 @@
       choices: [' ']
     };
 
-     // タイムラインを設定
-     var timeline = [];
-     timeline.push(mainProcedure); // 本試行
-     timeline.push(testInstruction); // 記憶テスト試行
-
     // 回答内容を格納する配列
     const responses = [];
 
@@ -469,7 +464,7 @@
           <p>先ほど聞いた単語を、</p>
           <p>できるかぎりたくさん思い出し、</p>
           <p><span style="font-size: 24px; font-weight: bold;">5文字のひらがなで入力してください。</span></p>
-          <p><span style="font-size: 24px; font-weight: bold;">1つの回答欄につき、1つの回答を入力して、</span></p>
+          <p><span style="font-size: 24px; font-weight: bold;">一つの回答欄につき、一つの回答を入力して、</span></p>
           <p><span style="font-size: 24px; font-weight: bold;">Enterキーを押してください（制限時間:10分）。</span></p>
         </div>
         <input 
