@@ -155,8 +155,8 @@
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
-            <p>
-              <b>質問:</b> 読み上げられた単語について、<br>
+            <p style="text-align: left;">
+              読み上げられた単語について、<br>
               <span style="font-size: 24px; font-weight: bold;">「後の記憶テストで思い出せる」に当てはまる程度</span>を選んでください。
             </p>
             <div style="text-align: center; margin: 20px 0;">
@@ -318,8 +318,8 @@
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
-            <p>
-              <b>質問:</b> 読み上げられた単語について、<br>
+            <p style="text-align: left;">
+              読み上げられた単語について、<br>
               <span style="font-size: 24px; font-weight: bold;">「後の記憶テストで思い出せる」に当てはまる程度</span>を選んでください。
             </p>
             <div style="text-align: center; margin: 20px 0;">
@@ -424,10 +424,44 @@
       timeline: [mainFixation].concat(mainTrials), // 配列を結合
     };
 
+    // 記憶テスト試行：教示
+    const testInstruction = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>記憶テスト試行（10分）</h1>
+        <p style="text-align: left;">
+          先ほど聞いた単語を、<br>
+          できるかぎりたくさん思い出してください。<br>
+          思い出した単語を<span style="color: #FF5722;">5文字のひらがな</span>で入力してください。
+        </p>
+        <p style="text-align: left;">
+          <b>留意事項１:</b><br>
+          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に回答してください。</span>
+        </p>
+        <p style="text-align: left;">
+          <b>留意事項２:</b><br>
+          <span style="color: #FF5722;">一つの回答欄につき、一つの回答を入力してください。</span>
+        </p>
+        <p style="text-align: left;">
+          <b>留意事項３:</b><br>
+          <span style="color: #FF5722;">Enterキーを押すと、新しい回答欄が表示されます。</span>
+        </p>
+        <p style="text-align: left; margin-top: 20px;">
+          <b>上記の内容について理解できましたら、スペースキーを押してください（記憶テスト試行へ）</b>
+        </p>
+      `,
+      choices: [' ']
+    };
+
+     // タイムラインを設定
+     var timeline = [];
+     timeline.push(mainProcedure); // 本試行
+     timeline.push(testInstruction); // 記憶テスト試行
+
     // 回答内容を格納する配列
     const responses = [];
 
-    // 自由再生試行
+    // 記憶テスト試行：操作
     const testTrial = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
@@ -473,11 +507,6 @@
         data.responses = responses; // 試行終了時に収集したデータを保存
       }
     };
-
-    // タイムラインを設定
-    var timeline = [];
-    timeline.push(mainProcedure); // 本試行
-    timeline.push(testTrial); // 自由再生試行
 
     // ファイル名としてsubject_idを使用
     const subject_id = jsPsych.randomization.randomID(10);
@@ -548,7 +577,8 @@
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
       mainProcedure,        // 本試行：操作
-      testTrial,            // 再生試行：操作
+      testInstruction,      // 記憶テスト試行：教示
+      testTrial,            // 記憶テスト試行：操作
       showCode,             // 終了時のコード提示
       save_data,            // データ保存
       finalMessage          // 最後のメッセージ
