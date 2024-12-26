@@ -311,7 +311,7 @@
 
     // 本試行：操作
     var mainTrials = [];
-    for (let index = 5; index < 15; index++) { // 6番目以降の音声を使用
+    for (let index = 5; index < 15; index++) { // 6番目から15番目の音声を使用 修正するの忘れない！！！！！！！！！！
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       mainTrials.push({
         type: jsPsychHtmlButtonResponse, // 一つの画面で提示
@@ -436,15 +436,15 @@
         </p>
         <p style="text-align: left;">
           <b>留意事項１:</b><br>
-          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に回答してください。</span>
+          <span style="color: #FF5722;">どんな順番でもよい</span>ので、思い出した順に回答してください。
         </p>
         <p style="text-align: left;">
           <b>留意事項２:</b><br>
-          <span style="color: #FF5722;">一つの回答欄につき、一つの回答を入力してください。</span>
+          <span style="color: #FF5722;">一つの回答欄につき、一つの回答を入力</span>してください。
         </p>
         <p style="text-align: left;">
           <b>留意事項３:</b><br>
-          <span style="color: #FF5722;">Enterキーを押すと、新しい回答欄が表示されます。</span>
+          <span style="color: #FF5722;">Enterキーを押すと、新しい回答欄が表示</span>されます。
         </p>
         <p style="text-align: left; margin-top: 20px;">
           <b>上記の内容について理解できましたら、スペースキーを押してください（記憶テスト試行へ）</b>
@@ -475,7 +475,10 @@
           autocorrect="off" 
           spellcheck="false" 
           inputmode="none" 
+          lang="ja" 
           autofocus
+          onfocus="this.setAttribute('readonly', true);" 
+          onblur="this.removeAttribute('readonly');"
         >
       `,
       choices: "NO_KEYS", // キーボード入力を無効化
