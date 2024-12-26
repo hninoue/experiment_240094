@@ -128,7 +128,6 @@
           </li>
           <li>
             <b>留意事項２:</b><br>
-            画面は自動で切り替わります。<br>
             <span style="color: #FF5722;">5秒以内に</span>、「1」から「6」のうち該当する1つをクリックしてください。<br>
             なお、5秒以内に選択できれば「<span style="color: green;">OK</span>」、そうでなければ「<span style="color: red;">時間切れ</span>」と表示されます。
           </li>
@@ -191,7 +190,7 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "15px";  // ボタンを左に15px移動
+            button.style.marginLeft = "20px";  // ボタンを左に15px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -292,7 +291,6 @@
           </li>
           <li>
             <b>留意事項２:</b><br>
-            画面は自動で切り替わります。<br>
             <span style="color: #FF5722;">5秒以内に</span>、「1」から「6」のうち該当する1つをクリックしてください。<br>
             なお、5秒以内に選択できれば「<span style="color: green;">OK</span>」、そうでなければ「<span style="color: red;">時間切れ</span>」と表示されます。
           </li>
@@ -355,7 +353,7 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "15px";  // ボタンを左に15px移動
+            button.style.marginLeft = "20px";  // ボタンを左に15px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -433,14 +431,23 @@
     const testTrial = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <div>
+        <div style="text-align: left;">
           <p>先ほど聞いた単語を、</p>
           <p>できるかぎりたくさん思い出し、</p>
-          <p> <span style="font-weight: bold;">5文字のひらがなで入力してください。</span></p>
-          <p> <span style="font-weight: bold;">1つの回答欄につき、1つの回答を入力して、</span></p>
-          <p> <span style="font-weight: bold;">Enterキーを押してください（制限時間:10分)。</span></p>
+          <p><span style="font-size: 24px; font-weight: bold;">5文字のひらがなで入力してください。</span></p>
+          <p><span style="font-size: 24px; font-weight: bold;">1つの回答欄につき、1つの回答を入力して、</span></p>
+          <p><span style="font-size: 24px; font-weight: bold;">Enterキーを押してください（制限時間:10分）。</span></p>
         </div>
-        <input id="response-box" type="text" style="width: 100%; padding: 10px;" autocomplete="off" autofocus>
+        <input 
+          id="response-box" 
+          type="text" 
+          style="width: 100%; padding: 10px; font-size: 28px;" 
+          autocomplete="off" 
+          autocorrect="off" 
+          spellcheck="false" 
+          inputmode="none" 
+          autofocus
+        >
       `,
       choices: "NO_KEYS", // キーボード入力を無効化
       trial_duration: 600000, // 試行の制限時間（10分: 600,000ミリ秒）
