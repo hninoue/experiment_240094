@@ -426,6 +426,47 @@
       timeline: [mainFixation].concat(mainTrials), // 配列を結合
     };
 
+    // 回答内容を格納する配列
+    const responses = [];
+
+    // 自由再生試行
+    const testTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <div>
+          <p>先ほど聞いた単語を、</p>
+          <p>できるかぎりたくさん思い出し、</p>
+          <p> <span style="font-size: 24px; font-weight: bold;">5文字のひらがなで入力してください。</span></p>
+          <p> <span style="font-size: 24px; font-weight: bold;">1つの回答欄につき、1つの回答を入力して、</span></p>
+          <p> <span style="font-size: 24px; font-weight: bold;">Enterキーを押してください（制限時間:10分)。</span></p>
+        </div>
+        <input id="response-box" type="text" style="width: 100%; padding: 10px;" autocomplete="off" autofocus>
+      `,
+      choices: "NO_KEYS", // キーボード入力を無効化
+      trial_duration: 600000, // 試行の制限時間（10分: 600,000ミリ秒）
+      on_load: () => {
+        const inputBox = document.getElementById('response-box');
+
+        // Enterキー押下時の処理
+        inputBox.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            event.preventDefault(); // デフォルト動作（フォーム送信）を防ぐ
+            const inputValue = inputBox.value.trim(); // 入力された単語を取得
+
+            if (inputValue.length > 0) {
+              const timestamp = performance.now(); // 入力時間を取得
+              responses.push({ word: inputValue, time: timestamp }); // データを記録
+            }
+
+            inputBox.value = ''; // 入力欄をクリア
+          }
+        });
+      },
+      on_finish: (data) => {
+        data.responses = responses; // 試行終了時に収集したデータを保存
+      }
+    };
+
     // ファイル名としてsubject_idを使用
     const subject_id = jsPsych.randomization.randomID(10);
     const filename = `${subject_id}.csv`;
@@ -495,6 +536,7 @@
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
       mainProcedure,        // 本試行：操作
+      testTrial,            // 再生試行：操作
       showCode,             // 終了時のコード提示
       save_data,            // データ保存
       finalMessage          // 最後のメッセージ
