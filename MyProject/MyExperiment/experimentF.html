@@ -311,7 +311,7 @@
 
     // 本試行：操作
     var mainTrials = [];
-    for (let index = 5; index < 15; index++) { // 6番目から15番目の音声を使用 修正するの忘れない！！！！！！！！！！
+    for (let index = 5; index < audioData.length; index++) { // 6番目以降の音声を使用
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       mainTrials.push({
         type: jsPsychHtmlButtonResponse, // 一つの画面で提示
@@ -424,6 +424,14 @@
       timeline: [mainFixation].concat(mainTrials), // 配列を結合
     };
 
+    // ダミー試行（白紙画面を挿入）
+    const dummyTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '', // 白紙画面
+      choices: "NO_KEYS", // キー入力を無効化
+      trial_duration: 100 // 100ms表示
+    };
+
     // 記憶テスト試行：教示
     const testInstruction = {
       type: jsPsychHtmlKeyboardResponse,
@@ -474,11 +482,9 @@
           autocomplete="off" 
           autocorrect="off" 
           spellcheck="false" 
-          inputmode="none" 
+          inputmode="text" 
           lang="ja" 
           autofocus
-          onfocus="this.setAttribute('readonly', true);" 
-          onblur="this.removeAttribute('readonly');"
         >
       `,
       choices: "NO_KEYS", // キーボード入力を無効化
@@ -575,6 +581,7 @@
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
       mainProcedure,        // 本試行：操作
+      dummyTrial,           // ダミー試行
       testInstruction,      // 記憶テスト試行：教示
       testTrial,            // 記憶テスト試行：操作
       showCode,             // 終了時のコード提示
