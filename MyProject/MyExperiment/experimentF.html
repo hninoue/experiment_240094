@@ -507,6 +507,11 @@
             inputBox.value = ''; // 入力欄をクリア
           }
         });
+
+        // IME予測変換を抑制
+        inputBox.addEventListener('compositionstart', function () {
+          inputBox.setAttribute('inputmode', 'kana'); // 入力モードをかな入力に設定
+        });
       },
       on_finish: (data) => {
         data.responses = responses; // 試行終了時に収集したデータを保存
