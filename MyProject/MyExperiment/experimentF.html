@@ -488,6 +488,7 @@
           autofocus
         >
       `,
+      choices: [], // jsPsychがキー入力を検出しないように設定
       trial_duration: 600000, // 試行の制限時間（10分: 600,000ミリ秒）
       on_load: () => {
         const inputBox = document.getElementById('response-box');
