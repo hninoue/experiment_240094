@@ -508,13 +508,17 @@
           }
         });
 
-        // IME予測変換を抑制
-        inputBox.addEventListener('compositionstart', function () {
+        // IME予測変換を完全に抑制
+        inputBox.addEventListener('focus', function () {
           inputBox.setAttribute('inputmode', 'kana'); // 入力モードをかな入力に設定
+          inputBox.setAttribute('style', 'ime-mode: disabled;'); // IMEを無効に設定
         });
-      },
-      on_finish: (data) => {
-        data.responses = responses; // 試行終了時に収集したデータを保存
+
+        // `compositionstart`イベントでIME制御
+        inputBox.addEventListener('compositionstart', function () {
+          inputBox.blur(); // フォーカスを外してIMEを一時停止
+          setTimeout(() => inputBox.focus(), 0); // 再フォーカスでIMEをリセット
+        });
       }
     };
 
