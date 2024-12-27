@@ -484,13 +484,10 @@
           autocorrect="off" 
           spellcheck="false" 
           lang="ja" 
+          inputmode="none" 
           autofocus
-          inputmode="none"
-          onfocus="this.setAttribute('readonly', true);" 
-          onblur="this.removeAttribute('readonly');" 
         >
       `,
-      choices: "NO_KEYS", // キーボード入力を無効化
       trial_duration: 600000, // 試行の制限時間（10分: 600,000ミリ秒）
       on_load: () => {
         const inputBox = document.getElementById('response-box');
