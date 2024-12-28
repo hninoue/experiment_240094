@@ -465,9 +465,63 @@
     // 回答内容を格納する配列
     const responses = [];
 
+    // ローマ字 → ひらがな変換関数
+    function convertToHiragana(romaji) {
+      const romajiToHiraganaMap = {
+        a: "あ", i: "い", u: "う", e: "え", o: "お",
+        ka: "か", ki: "き", ku: "く", ke: "け", ko: "こ",
+        sa: "さ", si: "し", su: "す", se: "せ", so: "そ", shi: "し", 
+        ta: "た", ti: "ち", tu: "つ", te: "て", to: "と", chi: "ち", tsu: "つ",
+        na: "な", ni: "に", nu: "ぬ", ne: "ね", no: "の",
+        ha: "は", hi: "ひ", hu: "ふ", he: "へ", ho: "ほ", fu: "ふ",
+        ma: "ま", mi: "み", mu: "む", me: "め", mo: "も",
+        ya: "や", yu: "ゆ", yo: "よ",
+        ra: "ら", ri: "り", ru: "る", re: "れ", ro: "ろ",
+        wa: "わ", wyi: "ゐ", wu: "う", wye: "ゑ", wo: "を",
+        nn: "ん",
+        wi: "うぃ", we: "うぇ",
+        kya: "きゃ", kyi: "きぃ", kyu: "きゅ", kye: "きぇ", kyo: "きょ",
+        sya: "しゃ", syi: "しぃ", syu: "しゅ", sye: "しぇ", syo: "しょ", sha: "しゃ", shu: "しゅ", she: "しぇ", sho: "しょ",
+        tya: "ちゃ", tyi: "ちぃ", tyu: "ちゅ", tye: "ちぇ", tyo: "ちょ", cha: "ちゃ", chu: "ちゅ", che: "ちぇ", cho: "ちょ",
+        nya: "にゃ", nyi: "にぃ", nyu: "にゅ", nye: "にぇ", nyo: "にょ",
+        hya: "ひゃ", hyi: "ひぃ", hyu: "ひゅ", hye: "ひぇ", hyo: "ひょ",
+        fa: "ふぁ", fi: "ふぃ", fe: "ふぇ", fo: "ふぉ",
+        mya: "みゃ", myi: "みぃ", myu: "みゅ", mye: "みぇ", myo: "みょ",
+        rya: "りゃ", ryi: "りぃ", ryu: "りゅ", rye: "りぇ", ryo: "りょ",
+        ga: "が", gi: "ぎ", gu: "ぐ", ge: "げ", go: "ご",
+        gya: "ぎゃ", gyi: "ぎぃ", gyu: "ぎゅ", gye: "ぎぇ", gyo: "ぎょ",
+        za: "ざ", zi: "じ", zu: "ず", ze: "ぜ", zo: "ぞ", ji: "じ",
+        zya: "じゃ", zyi: "じぃ", zyu: "じゅ", zye: "じぇ", jyo: "じょ", ja: "じゃ", ju: "じゅ", je: "じぇ", jo: "じょ",
+        da: "だ", di: "ぢ", du: "づ", de: "で", do: "ど",
+        dya: "ぢゃ", dyi: "ぢぃ", dyu: "ぢゅ",  dye: "ぢぇ", dyo: "ぢょ",
+        ba: "ば", bi: "び", bu: "ぶ", be: "べ", bo: "ぼ",
+        bya: "びゃ", byi: "びぃ", byu: "びゅ", bye: "びぇ", byo: "びょ",
+        pa: "ぱ", pi: "ぴ", pu: "ぷ", pe: "ぺ", po: "ぽ",
+        pya: "ぴゃ", pyi: "ぴぃ", pyu: "ぴゅ", pye: "ぴぇ", pyo: "ぴょ",
+        la: "ぁ", li: "ぃ", lu: "ぅ", le: "ぇ", lo: "ぉ", xa: "ぁ", xi: "ぃ", xu: "ぅ", xe: "ぇ", xo: "ぉ",
+        lya: "ゃ", lyu: "ゅ", lyo: "ょ", ltu: "っ", xya: "ゃ", xyu: "ゅ", xyo: "ょ", xtu: "っ", xtsu: "っ",
+        va: "ゔぁ", vi: "ゔぃ", vu: "ゔ", ve: "ゔぇ", vo: "ゔぉ"
+      };
+
+      let result = "";
+      let buffer = ""; // 部分一致のためのバッファ
+      for (const char of romaji) {
+        buffer += char;
+        if (romajiToHiraganaMap[buffer]) {
+          result += romajiToHiraganaMap[buffer];
+          buffer = ""; // バッファをクリア
+        } else if (buffer.length > 2) {
+          // 一致しない場合、バッファをリセット（未変換文字はそのまま出力）
+          result += buffer[0];
+          buffer = buffer.slice(1);
+        }
+      }
+      return result + buffer; // 残ったバッファを出力
+    }
+
     // 記憶テスト試行：操作
     const testTrial = {
-      type: jsPsychHtmlKeyboardHiragana,
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <div style="text-align: left;">
           <p>先ほど聞いた単語を、</p>
@@ -480,12 +534,22 @@
           id="response-box" 
           type="text" 
           style="width: 100%; padding: 10px; font-size: 28px;" 
+          autocomplete="off" 
+          autocorrect="off" 
+          spellcheck="false" 
         >
       `,
       choices: "NO_KEYS", // jsPsychがキー入力を検出しないように設定
       trial_duration: 600000, // 試行の制限時間（10分: 600,000ミリ秒）
       on_load: () => {
         const inputBox = document.getElementById('response-box');
+
+        // ローマ字入力 → ひらがな変換
+        inputBox.addEventListener('input', function (event) {
+          const romaji = inputBox.value; // 現在の入力値を取得
+          const hiragana = convertToHiragana(romaji); // ひらがなに変換
+          inputBox.value = hiragana; // 入力欄に変換結果を表示
+        });
 
         // Enterキー押下時の処理
         inputBox.addEventListener('keydown', function (event) {
@@ -503,8 +567,8 @@
         });
       },
       on_finish: (data) => {
-      data.responses = responses; // 試行終了時に収集したデータを保存
-      }
+        data.responses = responses; // 試行終了時に収集したデータを保存
+      },
     };
 
     // ファイル名としてsubject_idを使用
