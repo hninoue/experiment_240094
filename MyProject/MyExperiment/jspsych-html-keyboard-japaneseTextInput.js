@@ -8,11 +8,12 @@
  **/
 
 
-jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
-
-    var plugin = {};
-
-    plugin.info = {
+class HtmlKeyboardJapaneseTextInputPlugin {
+    constructor(jsPsych) {
+      this.jsPsych = jsPsych;
+    }
+  
+    static info = {
         name: 'html-keyboard-japaneseTextInput',
         description: '',
         parameters: {
@@ -63,19 +64,19 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
         }
     }
 
-    plugin.trial = function (display_element, trial) {
+    trial(display_element, trial) {
         var romanResponse = '';
         var keyCharacter = '';
 
-        var new_html = '<div id="jspsych-html-keyboard-japaneseTextInput-stimulus">' + trial.stimulus + '</div>';
+        var new_html = '<div id="jspsych-html-keyboard-japaneseTextInput-stimulus">${trial.stimulus}</div>';
 
         // add prompt
         if (trial.prompt !== null) {
-            new_html += '<div id="jspsych-html-keyboard-japaneseTextInput-prompt">' + trial.prompt + '</div>';
+            new_html += '<div id="jspsych-html-keyboard-japaneseTextInput-prompt">${trial.prompt}</div>';
         }
 
         // add Default text
-        new_html += '<div id="jspsych-html-keyboard-japaneseTextInput-convertText">' + trial.convertText + '</div>'
+        new_html += '<div id="jspsych-html-keyboard-japaneseTextInput-convertText">${trial.convertText}</div>'
 
         // draw
         display_element.innerHTML = new_html;
@@ -86,14 +87,14 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
             key: null
         };
 
-        var update_trial = function () {
+        var update_trial = () => {
 
-            var update_html = '<div id="jspsych-html-keyboard-japaneseTextInput-stimulus">' + trial.stimulus + '</div>'
+            var update_html = '<div id="jspsych-html-keyboard-japaneseTextInput-stimulus">${trial.stimulus}</div>'
 
             if (trial.prompt != null) {
-                update_html += '<div id="jspsych-html-keyboard-japaneseTextInput-prompt">' + trial.prompt + '</div>'
+                update_html += '<div id="jspsych-html-keyboard-japaneseTextInput-prompt">${trial.prompt}</div>'
             }
-            update_html += '<div id="jspsych-html-keyboard-japaneseTextInput-convertText">' + trial.convertText + '</div>'
+            update_html += '<div id="jspsych-html-keyboard-japaneseTextInput-convertText">${trial.convertText}</div>'
 
             //draw
             display_element.innerHTML = update_html;
@@ -106,14 +107,14 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
         }
 
         // function to end trial when it is time
-        var end_trial = function () {
+        var end_trial = () => {
 
             // kill any remaining setTimeout handlers
-            jsPsych.pluginAPI.clearAllTimeouts();
+            this.jsPsych.pluginAPI.clearAllTimeouts();
 
             // kill keyboard listeners
             if (typeof keyboardListener !== 'undefined') {
-                jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
+                this.jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
             }
 
             // gather the data to store for the trial
@@ -127,14 +128,14 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
             display_element.innerHTML = '';
 
             // move on to the next trial
-            jsPsych.finishTrial(trial_data);
+            this.jsPsych.finishTrial(trial_data);
         };
 
         // function to handle responses by the subject
-        var after_response = function (info) {
+        var after_response = (info) => {
             //数字からアルファベットまでの場合
             response = info;
-            keyCharacter = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(response.key)
+            keyCharacter = this.jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(response.key);
             if (keyCharacter == 'enter' && trial.enter_ends_trial == true) {
                 end_trial();
             } else if (keyCharacter == 'backspace' | keyCharacter == 'delete') {
@@ -162,9 +163,9 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
         };
 
         // start the response listener
-        var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
+        var keyboardListener = this.jsPsych.pluginAPI.getKeyboardResponse({
             callback_function: after_response,
-            valid_responses: jsPsych.ALL_KEYS,
+            valid_responses: this.jsPsych.ALL_KEYS,
             rt_method: 'performance',
             persist: true,
             allow_held_key: false
@@ -172,18 +173,19 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
 
         // hide stimulus if stimulus_duration is set
         if (trial.stimulus_duration !== null) {
-            jsPsych.pluginAPI.setTimeout(function () {
+            this.jsPsych.pluginAPI.setTimeout(() => {
                 display_element.querySelector('#jspsych-html-keyboard-hiragana-stimulus').style.visibility = 'hidden';
             }, trial.stimulus_duration);
         }
 
         // end trial if trial_duration is set
         if (trial.trial_duration !== null) {
-            jsPsych.pluginAPI.setTimeout(function () {
+            this.jsPsych.pluginAPI.setTimeout(() => {
                 end_trial();
             }, trial.trial_duration);
         }
+    }
+}
 
-    };
-    return plugin;
-})();
+// Register the plugin
+jsPsych.plugins['html-keyboard-japaneseTextInput'] = HtmlKeyboardJapaneseTextInputPlugin;
