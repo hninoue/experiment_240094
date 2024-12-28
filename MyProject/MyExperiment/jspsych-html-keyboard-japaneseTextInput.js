@@ -7,12 +7,12 @@
  *
  **/
 
-var HtmlKeyboardJapaneseTextInputPlugin = (function (jspsych) {
+var jsPsychHtmlKeyboardJapaneseTextInputPlugin = (function (jspsych) {
     "use strict";
 
     // プラグイン情報の定義
     const info = {
-        name: 'html-keyboard-japaneseTextInput',
+        name: "jsPsychHtmlKeyboardJapaneseTextInput",
         description: '',
         parameters: {
             stimulus: {
@@ -192,8 +192,8 @@ var HtmlKeyboardJapaneseTextInputPlugin = (function (jspsych) {
     }
   
     // プラグイン情報の追加
-    HtmlKeyboardJapaneseTextInputPlugin.info = info;
+    jsPsychHtmlKeyboardJapaneseTextInputPlugin.info = info;
 
-    return HtmlKeyboardJapaneseTextInputPlugin;
+    return jsPsychHtmlKeyboardJapaneseTextInputPlugin;
 
     })(jsPsych);
