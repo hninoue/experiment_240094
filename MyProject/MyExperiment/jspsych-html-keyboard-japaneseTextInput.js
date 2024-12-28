@@ -62,7 +62,7 @@ var jsPsychHtmlKeyboardJapaneseTextInputPlugin = (function (jspsych) {
     };
 
     // プラグイン本体
-    class HtmlKeyboardJapaneseTextInputPlugin {
+    class jsPsychHtmlKeyboardJapaneseTextInputPlugin {
         constructor(jsPsych) {
             this.jsPsych = jsPsych;
         }
