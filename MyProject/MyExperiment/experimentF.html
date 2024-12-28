@@ -509,7 +509,7 @@
         if (romajiToHiraganaMap[buffer]) {
           result += romajiToHiraganaMap[buffer];
           buffer = ""; // バッファをクリア
-        } else if (buffer.length > 2) {
+        } else if (buffer.length > 3) {
           // 一致しない場合、バッファをリセット（未変換文字はそのまま出力）
           result += buffer[0];
           buffer = buffer.slice(1);
@@ -543,13 +543,14 @@
       on_load: () => {
         const inputBox = document.getElementById('response-box');
 
-        // 日本語IMEを禁止
-        inputBox.setAttribute("lang", "en");
-        inputBox.addEventListener("compositionstart", (e) => e.preventDefault());
+        // 日本語入力を禁止する
+        inputBox.addEventListener('compositionstart', (event) => {
+          event.preventDefault(); // 日本語入力の開始をキャンセル
+        });
 
         // ローマ字入力 → ひらがな変換
-        inputBox.addEventListener('input', function (event) {
-          const romaji = inputBox.value; // 現在の入力値を取得
+        inputBox.addEventListener('input', function () {
+          const romaji = inputBox.value.toLowerCase(); // 入力値を取得
           const hiragana = convertToHiragana(romaji); // ひらがなに変換
           inputBox.value = hiragana; // 入力欄に変換結果を表示
         });
