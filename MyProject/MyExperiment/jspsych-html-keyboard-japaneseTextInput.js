@@ -7,7 +7,7 @@
  *
  **/
 
-var htmlKeyboardJapaneseTextInputPlugin = (function (jspsych) {
+var HtmlKeyboardJapaneseTextInputPlugin = (function (jspsych) {
     "use strict";
 
     // プラグイン情報の定義
