@@ -186,6 +186,3 @@ class HtmlKeyboardJapaneseTextInputPlugin {
         }
     }
 }
-
-// Register the plugin
-jsPsych.plugins['html-keyboard-japaneseTextInput'] = HtmlKeyboardJapaneseTextInputPlugin;
