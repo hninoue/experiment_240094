@@ -8,10 +8,12 @@
  **/
 
 
-jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function() {
-    var plugin = {};
+class HtmlKeyboardJapaneseTextInputPlugin {
+    constructor(jsPsych) {
+      this.jsPsych = jsPsych;
+    }
   
-    plugin.info = {
+    static info = {
         name: 'html-keyboard-japaneseTextInput',
         description: '',
         parameters: {
@@ -61,7 +63,7 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function() {
         }
     };
 
-    plugin.trial = function(display_element, trial) {
+    trial(display_element, trial) {
         var romanResponse = '';
         var keyCharacter = '';
 
@@ -101,7 +103,7 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function() {
                 rt: null,
                 key: null
             };
-        }
+        };
 
         // function to end trial when it is time
         var end_trial = () => {
@@ -181,7 +183,8 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function() {
                 end_trial();
             }, trial.trial_duration);
         }
-    };
-
-    return plugin;
-})();
+    }
+}
+  
+// Register the plugin
+jsPsych.plugins['html-keyboard-japaneseTextInput'] = HtmlKeyboardJapaneseTextInputPlugin;
