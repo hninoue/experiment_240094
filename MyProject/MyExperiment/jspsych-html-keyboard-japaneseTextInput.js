@@ -17,44 +17,44 @@ jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function () {
         description: '',
         parameters: {
             stimulus: {
-                type: jsPsych.plugins.parameterType.HTML_STRING,
+                type: "string",
                 pretty_name: 'Stimulus',
                 default: undefined,
                 description: 'The HTML string to be displayed'
             },
             inputSystem: {
-                type: jsPsych.plugins.parameterType.STRING,
+                type: "string",
                 pretty_name: 'InputSystem',
                 default: 'hiragana',
                 description: 'Kana system will be displayed'
             },
             convertText: {
-                type: jsPsych.plugins.parameterType.STRING,
+                type: "string",
                 array: true,
                 pretty_name: 'Default text',
                 default: '<span class ="textCursor">|</span>',
                 description: 'Text will be displayed before response.'
             },
             prompt: {
-                type: jsPsych.plugins.parameterType.STRING,
+                type: "string",
                 pretty_name: 'Prompt',
                 default: null,
                 description: 'Any content here will be displayed avobe the stimulus.'
             },
             stimulus_duration: {
-                type: jsPsych.plugins.parameterType.INT,
+                type: "int",
                 pretty_name: 'Stimulus duration',
                 default: null,
                 description: 'How long to hide the stimulus.'
             },
             trial_duration: {
-                type: jsPsych.plugins.parameterType.INT,
+                type: "int",
                 pretty_name: 'Trial duration',
                 default: null,
                 description: 'How long to show trial before it ends.'
             },
             enter_ends_trial: {
-                type: jsPsych.plugins.parameterType.BOOL,
+                type: "bool",
                 pretty_name: 'Enter ends trial',
                 default: false,
                 description: 'If true, trial will end when subject type enter key.'
