@@ -8,12 +8,10 @@
  **/
 
 
-class HtmlKeyboardJapaneseTextInputPlugin {
-    constructor(jsPsych) {
-      this.jsPsych = jsPsych;
-    }
+jsPsych.plugins["html-keyboard-japaneseTextInput"] = (function() {
+    var plugin = {};
   
-    static info = {
+    plugin.info = {
         name: 'html-keyboard-japaneseTextInput',
         description: '',
         parameters: {
@@ -60,11 +58,10 @@ class HtmlKeyboardJapaneseTextInputPlugin {
                 default: false,
                 description: 'If true, trial will end when subject type enter key.'
             },
-
         }
-    }
+    };
 
-    trial(display_element, trial) {
+    plugin.trial = function(display_element, trial) {
         var romanResponse = '';
         var keyCharacter = '';
 
@@ -184,5 +181,7 @@ class HtmlKeyboardJapaneseTextInputPlugin {
                 end_trial();
             }, trial.trial_duration);
         }
-    }
-}
+    };
+
+    return plugin;
+})();
