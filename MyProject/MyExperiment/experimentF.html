@@ -544,6 +544,10 @@
       on_load: () => {
         const inputBox = document.getElementById('response-box');
 
+        // 日本語IMEを禁止
+        inputBox.setAttribute("lang", "en");
+        inputBox.addEventListener("compositionstart", (e) => e.preventDefault());
+
         // ローマ字入力 → ひらがな変換
         inputBox.addEventListener('input', function (event) {
           const romaji = inputBox.value; // 現在の入力値を取得
