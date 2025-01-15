@@ -9,59 +9,57 @@
  **/
 
 
-jsPsych.plugins["html-keyboard-hiragana"] = (function () {
+class HtmlKeyboardHiraganaPlugin {
+    constructor(jsPsych) {
+        this.jsPsych = jsPsych;
+    }
 
-    var plugin = {};
-
-    plugin.info = {
+    static info = {
         name: 'html-keyboard-hiragana',
-        description: '',
         parameters: {
             stimulus: {
-                type: "string",
+                type: jsPsych.plugins.parameterType.HTML_STRING,
                 pretty_name: 'Stimulus',
                 default: undefined,
                 description: 'The HTML string to be displayed'
             },
             inputBox: {
-                type: "string",
-                array: true,
-                pretty_name: 'inputBox',
-                default: '<span class ="textCursor">|</span>',
-                description: 'Inbut box showing hiragana.'
+                type: jsPsych.plugins.parameterType.STRING,
+                pretty_name: 'Input Box',
+                default: '<span class="textCursor">|</span>',
+                description: 'Input box showing hiragana.'
             },
             prompt: {
-                type: "string",
+                type: jsPsych.plugins.parameterType.STRING,
                 pretty_name: 'Prompt',
                 default: null,
-                description: 'Any content here will be displayed avobe the stimulus.'
+                description: 'Any content to display above the stimulus.'
             },
             stimulus_duration: {
-                type: "int",
+                type: jsPsych.plugins.parameterType.INT,
                 pretty_name: 'Stimulus duration',
                 default: null,
                 description: 'How long to hide the stimulus.'
             },
             trial_duration: {
-                type: "int",
+                type: jsPsych.plugins.parameterType.INT,
                 pretty_name: 'Trial duration',
                 default: null,
                 description: 'How long to show trial before it ends.'
             },
             enter_ends_trial: {
-                type: "bool",
+                type: jsPsych.plugins.parameterType.BOOL,
                 pretty_name: 'Enter ends trial',
                 default: false,
-                description: 'If true, trial will end when subject type enter key.'
-            },
-
+                description: 'If true, trial will end when subject presses the Enter key.'
+            }
         }
-    }
+    };
 
-    plugin.trial = function (display_element, trial) {
+    trial(display_element, trial) {
         //ローマ字からひらがなへの変換
         //変換リスト
-        let roman2hiragana = {
+        const romanToHiraganaMap = {
             'a': 'あ',
             'i': 'い',
             'u': 'う',
@@ -261,146 +259,80 @@ jsPsych.plugins["html-keyboard-hiragana"] = (function () {
          * @param (String) roman:
          * @return (String): hiragana
          */
-        function romanToHiranaga(roman) {
-            let i, iz, match, regex,
-                hiragana = '',
-                table = roman2hiragana;
-
-            regex = new RegExp((function (table) {
-                let key,
-                    s = '^(?:';
-
-                for (key in table)
-                    if (table.hasOwnProperty(key)) {
-                        s += key + '|';
-                    }
-                return s + '(?:n(?![aiueo]|y[aiueo]|$))|' + '([^aiueon])\\1)';
-            })(table));
-            for (i = 0, iz = roman.length; i < iz; ++i) {
-                if (match = roman.slice(i).match(regex)) {
-                    if (match[0] === 'n') {
-                        hiragana += 'ん';
-                    } else if (/^([^n])\1$/.test(match[0])) {
-                        hiragana += 'っ';
-                        --i;
-                    } else {
-                        hiragana += table[match[0]];
-                    }
-                    i += match[0].length - 1;
-                } else {
-                    hiragana += roman[i];
-                }
+        const romanToHiragana = (roman) => {
+            let hiragana = '';
+            for (let char of roman) {
+                hiragana += romanToHiraganaMap[char] || char;
             }
             return hiragana;
-        }
+        };
 
-        //initialze vars
-        var romanResponse = '';
-
-        var new_html = '<div id="jspsych-html-keyboard-hiragana-stimulus">' + trial.stimulus + '</div>';
-
-        // add prompt
-        if (trial.prompt !== null) {
-            new_html += '<div id="jspsych-html-keyboard-hiragana-prompt">' + trial.prompt + '</div>';
-        }
-
-        // add inputBox
-        new_html += '<div id="jspsych-html-keyboard-hiragana-inputBox">' + trial.inputBox + '</div>'
-
-        // draw
-        display_element.innerHTML = new_html;
-
-        // store response
-        var response = {
+        let romanResponse = '';
+        let response = {
             rt: null,
             key: null
         };
 
-        var update_trial = function () {
-
-            var update_html = '<div id="jspsych-html-keyboard-hiragana-stimulus">' + trial.stimulus + '</div>'
-
-            if (trial.prompt != null) {
-                update_html += '<div id="jspsych-html-keyboard-hiragana-prompt">' + trial.prompt + '</div>'
-            }
-            update_html += '<div id="jspsych-html-keyboard-hiragana-inputBox">' + trial.inputBox + '</div>'
-
-            //draw
-            display_element.innerHTML = update_html;
-
-            // store response
-            var response = {
-                rt: null,
-                key: null
-            };
+        // 初期HTMLの生成
+        let html = `<div id="jspsych-html-keyboard-hiragana-stimulus">${trial.stimulus}</div>`;
+        if (trial.prompt) {
+            html += `<div id="jspsych-html-keyboard-hiragana-prompt">${trial.prompt}</div>`;
         }
+        html += `<div id="jspsych-html-keyboard-hiragana-inputBox">${trial.inputBox}</div>`;
 
+        display_element.innerHTML = html;
 
-        // function to end trial when it is time
-        var end_trial = function () {
+        const end_trial = () => {
+            this.jsPsych.pluginAPI.clearAllTimeouts();
+            this.jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
 
-            // kill any remaining setTimeout handlers
-            jsPsych.pluginAPI.clearAllTimeouts();
-
-            // kill keyboard listeners
-            if (typeof keyboardListener !== 'undefined') {
-                jsPsych.pluginAPI.cancelKeyboardResponse(keyboardListener);
-            }
-
-            // gather the data to store for the trial
-            var trial_data = {
-                "rt": response.rt,
-                "stimulus": trial.stimulus,
-                "hiraganaResponse": trial.inputBox
+            let trial_data = {
+                rt: response.rt,
+                stimulus: trial.stimulus,
+                hiraganaResponse: trial.inputBox
             };
 
-            // clear the display
             display_element.innerHTML = '';
-
-            // move on to the next trial
-            jsPsych.finishTrial(trial_data);
+            this.jsPsych.finishTrial(trial_data);
         };
 
-        // function to handle responses by the subject
-        var after_response = function (info) {
-            //数字からアルファベットまでの場合
+        const after_response = (info) => {
             response = info;
-            if (response.key >= 48 & response.key <= 90 | response.key == 189) {
-                romanResponse += jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(response.key);
-                trial.inputBox = romanToHiranaga(romanResponse);
-            } else if (response.key == 8 | response.key == 46) {
+
+            if ((response.key >= 48 && response.key <= 90) || response.key === 189) {
+                romanResponse += this.jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(response.key);
+                trial.inputBox = romanToHiragana(romanResponse);
+            } else if (response.key === 8 || response.key === 46) {
                 romanResponse = romanResponse.slice(0, -1);
-                trial.inputBox = romanToHiranaga(romanResponse);
-            } else if (response.key == 13 && trial.enter_ends_trial == true) {
+                trial.inputBox = romanToHiragana(romanResponse);
+            } else if (response.key === 13 && trial.enter_ends_trial) {
                 end_trial();
             }
-            update_trial();
+
+            display_element.querySelector('#jspsych-html-keyboard-hiragana-inputBox').innerHTML = trial.inputBox;
         };
 
-        // start the response listener
-        var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
+        const keyboardListener = this.jsPsych.pluginAPI.getKeyboardResponse({
             callback_function: after_response,
-            valid_responses: jsPsych.ALL_KEYS,
+            valid_responses: this.jsPsych.ALL_KEYS,
             rt_method: 'performance',
             persist: true,
             allow_held_key: false
         });
 
-        // hide stimulus if stimulus_duration is set
         if (trial.stimulus_duration !== null) {
-            jsPsych.pluginAPI.setTimeout(function () {
+            this.jsPsych.pluginAPI.setTimeout(() => {
                 display_element.querySelector('#jspsych-html-keyboard-hiragana-stimulus').style.visibility = 'hidden';
             }, trial.stimulus_duration);
         }
 
-        // end trial if trial_duration is set
         if (trial.trial_duration !== null) {
-            jsPsych.pluginAPI.setTimeout(function () {
+            this.jsPsych.pluginAPI.setTimeout(() => {
                 end_trial();
             }, trial.trial_duration);
         }
-
     };
+}
 
-    return plugin;
-})();
+// プラグインの登録
+jsPsych.plugins['html-keyboard-hiragana'] = HtmlKeyboardHiraganaPlugin;
