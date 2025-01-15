@@ -5,6 +5,8 @@
     <script src="https://unpkg.com/jspsych@7.3.4"></script>
     <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-initialize-microphone@1.0.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-audio-response@1.0.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.3"></script>
@@ -12,9 +14,7 @@
     <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
   </head>
-  <body>
-    <script src="jspsych-html-keyboard-hiragana.js"></script>
-  </body>
+  <body></body>
   <script>
     const jsPsych = initJsPsych();
 
@@ -50,7 +50,7 @@
       type: jsPsychFullscreen,
       fullscreen_mode: true,
       message: `
-        <h1>お願い</h1>
+        <h1>本実験の進め方について</h1>
         <style>
           ul, li {
             text-align: left;
@@ -69,7 +69,7 @@
     var volumeInstruction = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <h1>事前準備</h1>
+        <h1>事前準備１</h1>
         <p>これから実験の準備を始めます。</p>
         <style>
           ul, li {
@@ -98,6 +98,103 @@
       `,
       choices: [' '],
       trial_ends_after_audio: false, // 音声が再生されても試行が終了しない
+    };
+
+    // マイク初期化フェイズ
+    var micInstruction = {
+      type: jsPsychInitializeMicrophone,
+      device_select_message: `
+        <h1>事前準備２</h1>
+        <p>本実験ではマイクを使います。</p>
+        <div style="text-align: left;">
+            <p>「続ける」ボタンを押した後に、マイクの使用許可を求めるダイアログが表示されます。</p>
+            <p><span style="font-size: 24px; font-weight: bold;">ダイアログが表示されたら、「許可」を選択してください。</span></p>
+        </div>`,
+        button_label: "続ける",
+    };
+
+    // マイクテストフェイズ
+    var micTest = {
+      type: jsPsychHtmlAudioResponse,
+      stimulus: `
+        <h1>マイクテスト</h1>
+        <p>「けんとうし」と発音してください。</p>
+        <style>
+          ul, li {
+            text-align: left;
+          }
+        </style>
+        <ul>
+            <li><b>手順１</b><br>「録音開始」ボタンを押してください。</li>
+            <li><b>手順２</b><br>「けんとうし」と発音してください。</li>
+            <li><b>手順３</b><br>「録音完了」ボタンを押してください。</li>
+            <li><b>手順４</b><br>「録音再生」ボタンを押して、正確に録音できているか確認してください。</li>
+        </ul>
+        <br><br><b>録音できていることを確認できましたら、「次へ進む」ボタンを押してください</b>
+      `,
+      choices: "NO_KEYS", // キー入力を無効化
+      on_load: function() {
+        let mediaRecorder;
+        let audioChunks = [];
+
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
+        const playButton = document.getElementById('play-recording');
+        const nextButton = document.getElementById('next-button');
+        const statusText = document.getElementById('recording-status');
+
+        // 録音初期化
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then((stream) => {
+            mediaRecorder = new MediaRecorder(stream);
+
+            // 録音データ収集
+            mediaRecorder.ondataavailable = (event) => {
+              audioChunks.push(event.data);
+            };
+
+            // 録音停止時に再生ボタンを有効化
+            mediaRecorder.onstop = () => {
+              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+
+              // 再生ボタンで録音を再生
+              playButton.disabled = false;
+              playButton.onclick = () => {
+                audio.play();
+              };
+
+              // 次の試行に進むボタンを有効化
+              nextButton.style.display = 'block';
+              nextButton.onclick = () => {
+                jsPsych.finishTrial({ audio: audioBlob });
+              };
+
+              statusText.textContent = "録音が完了しました。再生して確認し、「次へ進む」を押してください。";
+            };
+          })
+          .catch((error) => {
+            statusText.textContent = "マイクにアクセスできませんでした。ブラウザの設定を確認してください。";
+          });
+
+        // 録音開始ボタンの動作
+        startButton.onclick = () => {
+          audioChunks = []; // 前回の録音データをクリア
+          mediaRecorder.start();
+          statusText.textContent = "録音中です。録音を停止するには「録音停止」を押してください。";
+          startButton.disabled = true;
+          stopButton.disabled = false;
+        };
+
+        // 録音停止ボタンの動作
+        stopButton.onclick = () => {
+          mediaRecorder.stop();
+          statusText.textContent = "録音を停止しました。録音を再生して確認してください。";
+          startButton.disabled = false;
+          stopButton.disabled = true;
+        };
+      },
     };
 
     // 練習試行：教示
@@ -465,8 +562,8 @@
 
     //記憶テスト試行：操作
     const testTrial = {
-      type: jsPsychjsPsychHtmlKeyboardHiragana,
-      prompt: `
+      type: jsPsychHtmlAudioResponse,
+      stimulus: `
         <div style="text-align: left;">
           <p>先ほど聞いた単語を、</p>
           <p>できるかぎりたくさん思い出し、</p>
@@ -475,8 +572,12 @@
           <p><span style="font-size: 24px; font-weight: bold;">Enterキーを押してください（制限時間:10分）。</span></p>
         </div>
       `,
-      trial_duration: 600000,
-      enter_ends_trial: false,
+      recording_duration: 600000, // 10分 = 600,000ミリ秒
+      prompt: "<p>録音中です...</p>",
+      post_trial_gap: 500, // 試行終了後のギャップ
+      save_audio: true, // 録音を保存
+      save_to_file: true, // ファイルに直接保存
+      filename: `free_recall_${jsPsych.randomization.randomID(8)}.wav`,
     };
 
     // ファイル名としてsubject_idを使用
@@ -544,6 +645,8 @@
       enterFullscreen,      // フルスクリーン
       volumeInstruction,    // 音量調整：教示
       volumeAdjustment,     // 音量調整：操作
+      micInstruction,       // マイクテスト：教示
+      micTest,              // マイクテスト：操作
       practiceInstruction,  // 練習試行：教示
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
