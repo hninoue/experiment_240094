@@ -589,13 +589,14 @@
     //記憶テスト試行：操作
     const testTrial = {
       type: jsPsychHtmlAudioResponse,
-      stimulus: "<p>テスト中。</p>",
-      recording_duration: 10000, // 10秒間録音
-      prompt: "<p>録音中です...</p>",
-      save_audio: true,
-      on_finish: function(data) {
-        console.log('録音が完了しました:', data.audio);
-      },
+      stimulus:  `
+        <div style="text-align: left;">
+          <p>先ほど聞いた単語を、</p>
+          <p>できるかぎりたくさん思い出してください。</p>
+        </div>
+      `,
+      recording_duration: 10000,
+      allow_playback: false
     };
 
     // ファイル名としてsubject_idを使用
