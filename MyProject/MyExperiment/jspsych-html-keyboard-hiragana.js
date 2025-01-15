@@ -9,6 +9,7 @@
  **/
 
 
+// プラグインの定義
 class HtmlKeyboardHiraganaPlugin {
     constructor(jsPsych) {
         this.jsPsych = jsPsych;
@@ -18,37 +19,37 @@ class HtmlKeyboardHiraganaPlugin {
         name: 'html-keyboard-hiragana',
         parameters: {
             stimulus: {
-                type: 'HTML_STRING', // 型説明コメント
+                type: 'HTML_STRING',
                 pretty_name: 'Stimulus',
                 default: undefined,
                 description: 'The HTML string to be displayed'
             },
             inputBox: {
-                type: 'STRING', // 型説明コメント
+                type: 'STRING',
                 pretty_name: 'Input Box',
                 default: '<span class="textCursor">|</span>',
                 description: 'Input box showing hiragana.'
             },
             prompt: {
-                type: 'STRING', // 型説明コメント
+                type: 'STRING',
                 pretty_name: 'Prompt',
                 default: null,
                 description: 'Any content to display above the stimulus.'
             },
             stimulus_duration: {
-                type: 'INT', // 型説明コメント
+                type: 'INT',
                 pretty_name: 'Stimulus duration',
                 default: null,
                 description: 'How long to hide the stimulus.'
             },
             trial_duration: {
-                type: 'INT', // 型説明コメント
+                type: 'INT',
                 pretty_name: 'Trial duration',
                 default: null,
                 description: 'How long to show trial before it ends.'
             },
             enter_ends_trial: {
-                type: 'BOOL', // 型説明コメント
+                type: 'BOOL',
                 pretty_name: 'Enter ends trial',
                 default: false,
                 description: 'If true, trial will end when subject presses the Enter key.'
@@ -334,5 +335,9 @@ class HtmlKeyboardHiraganaPlugin {
     }
 }
 
-// プラグインの登録
-jsPsych.plugins['html-keyboard-hiragana'] = HtmlKeyboardHiraganaPlugin;
+// jsPsychプラグインとして登録する方法
+if (typeof jsPsych !== 'undefined') {
+    jsPsych.plugins['html-keyboard-hiragana'] = HtmlKeyboardHiraganaPlugin;
+} else {
+    console.error('jsPsych is not loaded properly.');
+}
