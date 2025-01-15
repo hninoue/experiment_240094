@@ -10,7 +10,7 @@
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    if (typeof jsPsych !== 'undefined') {
+    if (typeof jsPsych !== 'undefined' && jsPsych.plugins) {
         // プラグインの定義
         class HtmlKeyboardHiraganaPlugin {
             constructor(jsPsych) {
@@ -256,8 +256,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     'vo': 'ヴぉ'
                 };
 
-            
-
                 /*
                 * roman -> hiragana
                 *
@@ -342,6 +340,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // プラグインの登録
         jsPsych.plugins['html-keyboard-hiragana'] = HtmlKeyboardHiraganaPlugin;
     } else {
-        console.error('jsPsych is not loaded properly.');
+        console.error('jsPsych is not loaded properly or jsPsych.plugins is undefined.');
     }
 });
