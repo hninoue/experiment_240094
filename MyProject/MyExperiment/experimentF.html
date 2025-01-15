@@ -100,22 +100,31 @@
       trial_ends_after_audio: false, // 音声が再生されても試行が終了しない
     };
 
-    // マイク初期化フェイズ
+    // マイク初期化：教示
     var micInstruction = {
-      type: jsPsychInitializeMicrophone,
-      device_select_message: `
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
         <h1>事前準備２</h1>
         <p>本実験ではマイクを使います。</p>
         <div style="text-align: left;">
-            <p>「続ける」ボタンを押した後に、マイクの使用許可を求めるダイアログが表示されます。</p>
+            <p>スペースキーを押した後に、マイクの使用許可を求めるダイアログが表示されます。</p>
             <p><span style="font-size: 24px; font-weight: bold;">ダイアログが表示されたら、「許可」を選択してください。</span></p>
-        </div>`,
-        button_label: "続ける",
+        </div>
+        <br><br><b>上記の内容について理解できましたら、スペースキーを押してください</b>
+      `,
+      choices: [' ']
+    };
+
+    // マイク初期化：操作
+    var micSetting = {
+      type: jsPsychInitializeMicrophone,
+      device_select_message: `「許可」を選択できたら、「続ける」ボタンを押してください。`,
+      button_label: "続ける",
     };
 
     // マイクテストフェイズ
     var micTest = {
-      type: jsPsychHtmlAudioResponse,
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
         <h1>マイクテスト</h1>
         <p>「けんとうし」と発音してください。</p>
@@ -130,9 +139,16 @@
             <li><b>手順３</b><br>「録音完了」ボタンを押してください。</li>
             <li><b>手順４</b><br>「録音再生」ボタンを押して、正確に録音できているか確認してください。</li>
         </ul>
-        <br><br><b>録音できていることを確認できましたら、「次へ進む」ボタンを押してください</b>
+        <br><b>録音できていることを確認できましたら、「次へ進む」ボタンを押すか、スペースキーを押してください。</b>
+        <div style="margin-top: 20px;">
+          <button id="start-recording" style="font-size: 16px; padding: 10px; margin: 5px;">録音開始</button>
+          <button id="stop-recording" style="font-size: 16px; padding: 10px; margin: 5px;" disabled>録音完了</button>
+          <button id="play-recording" style="font-size: 16px; padding: 10px; margin: 5px;" disabled>録音再生</button>
+          <button id="next-button" style="font-size: 16px; padding: 10px; margin: 20px; display: none;">次へ進む</button>
+        </div>
+        <p id="recording-status" style="margin-top: 20px; font-weight: bold; color: green;">録音を開始するには「録音開始」を押してください。</p>
       `,
-      choices: "NO_KEYS", // キー入力を無効化
+      choices: [' '], // スペースキーで進行可能
       on_load: function() {
         let mediaRecorder;
         let audioChunks = [];
@@ -182,7 +198,7 @@
         startButton.onclick = () => {
           audioChunks = []; // 前回の録音データをクリア
           mediaRecorder.start();
-          statusText.textContent = "録音中です。録音を停止するには「録音停止」を押してください。";
+          statusText.textContent = "録音中です。録音を停止するには「録音完了」を押してください。";
           startButton.disabled = true;
           stopButton.disabled = false;
         };
