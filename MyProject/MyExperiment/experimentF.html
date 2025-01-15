@@ -187,7 +187,6 @@
                 jsPsych.finishTrial({ audio: audioBlob });
               };
 
-              statusText.textContent = "録音が完了しました。再生して確認し、「次へ進む」を押してください。";
             };
           })
           .catch((error) => {
@@ -555,19 +554,14 @@
         <p style="text-align: left;">
           先ほど聞いた単語を、<br>
           できるかぎりたくさん思い出してください。<br>
-          思い出した単語を<span style="color: #FF5722;">5文字のひらがな</span>で入力してください。
         </p>
         <p style="text-align: left;">
           <b>留意事項１:</b><br>
-          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に</span>回答してください。
+          思い出した単語を<span style="color: #FF5722;">口頭</span>で答えてください。
         </p>
         <p style="text-align: left;">
           <b>留意事項２:</b><br>
-          <span style="color: #FF5722;">一つの回答欄につき、一つの回答を入力</span>してください。
-        </p>
-        <p style="text-align: left;">
-          <b>留意事項３:</b><br>
-          <span style="color: #FF5722;">Enterキーを押すと、新しい回答欄が表示</span>されます。
+          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に</span>回答してください。
         </p>
         <p style="text-align: left; margin-top: 20px;">
           <b>上記の内容について理解できましたら、スペースキーを押してください（記憶テスト試行へ）</b>
@@ -582,18 +576,18 @@
       stimulus: `
         <div style="text-align: left;">
           <p>先ほど聞いた単語を、</p>
-          <p>できるかぎりたくさん思い出し、</p>
-          <p><span style="font-size: 24px; font-weight: bold;">5文字のひらがなで入力してください。</span></p>
-          <p><span style="font-size: 24px; font-weight: bold;">一つの回答欄につき、一つの回答を入力して、</span></p>
-          <p><span style="font-size: 24px; font-weight: bold;">Enterキーを押してください（制限時間:10分）。</span></p>
+          <p>できるかぎりたくさん思い出してください。</p>
         </div>
       `,
-      recording_duration: 600000, // 10分 = 600,000ミリ秒
+      recording_duration: 600000, // 10分（600,000ミリ秒）
       prompt: "<p>録音中です...</p>",
-      post_trial_gap: 500, // 試行終了後のギャップ
-      save_audio: true, // 録音を保存
+      save_audio: true, // 録音データを保存
       save_to_file: true, // ファイルに直接保存
       filename: `free_recall_${jsPsych.randomization.randomID(8)}.wav`,
+      post_trial_gap: 500, // 試行終了後に0.5秒の間隔を設定
+      on_finish: function(data) {
+        console.log('録音が完了しました:', data.audio); // 録音データをコンソールで確認
+      },
     };
 
     // ファイル名としてsubject_idを使用
