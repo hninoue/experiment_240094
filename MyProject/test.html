@@ -113,3 +113,72 @@
         data.responses = responses;
       },
     };
+
+    // ファイル名としてsubject_idを使用
+    const subject_id = jsPsych.randomization.randomID(10);
+    const filename = `${subject_id}.csv`;
+            
+    // 終了時のコード提示
+    var showCode = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        // subject_idをデータに追加
+        jsPsych.data.addDataToLastTrial({ subject_id: subject_id });
+
+        return `
+          <h1>実験終了</h1>
+          <p>実験にご協力くださり誠にありがとうございました。</p>
+          <style>
+            ul, li {
+              text-align: left;
+            }
+          </style>
+          <ul>
+            <li><b>お願い１:</b><br>Amazonギフト券をお送りするために、法政Gmailアドレスが必要です。</li>
+            <li><b>お願い２:</b><br>下記の英数字コードをメモ（コピー＆ペースト）してください。<br>それが困難な場合には、スクリーンショットを保存してください。</li>
+          </ul>
+          <br><br><b>英数字コード: <strong>${subject_id}</strong></b>
+          <br><br><b>コードを控えることができましたら、スペースキーを押してください</b>
+        `;
+      },
+      choices: [' ']
+    };
+
+    //データ保存
+    const save_data = {
+      type: jsPsychPipe,
+      action: "save",
+      experiment_id: "T8aEfMCgzvhC",
+      filename: filename,
+      data_string: ()=>jsPsych.data.get().csv()
+    };
+
+    // save_dataの後に表示する試行
+    var finalMessage = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p style="text-align: left;">改めまして、</p>
+        <p style="text-align: left;">実験にご協力くださり誠にありがとうございました。</p>
+        <p style="text-align: left;"><b>下記のリンクをクリックしてください。</b></p>
+        <p style="text-align: left;">＊リンクは、謝礼を送るのに必要な情報を記入していただくGoogleフォームにつながっています。</p>
+        <br><br>
+        <p style="text-align: center;">
+          <a href="https://forms.gle/zpzJ2A69Fo2G4VNL9" target="_blank" style="font-size: 18px; color: blue; text-decoration: underline;">
+            https://forms.gle/zpzJ2A69Fo2G4VNL9
+          </a>
+        </p>
+        <br><br>
+        <b>リンクを開いた後、こちらのブラウザを閉じてください。</b>
+      `,
+      choices: "NO_KEYS", // キー入力なし
+    };
+
+    // 実験の実行
+    jsPsych.run([
+      testTrial,            // 記憶テスト試行：操作
+      showCode,             // 終了時のコード提示
+      save_data,            // データ保存
+      finalMessage          // 最後のメッセージ
+    ]);
+  </script>
+</html>
