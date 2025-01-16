@@ -155,7 +155,7 @@
             <li><b>手順３</b><br>「録音完了」ボタンを押してください。</li>
             <li><b>手順４</b><br>「録音再生」ボタンを押して、正確に録音できているか確認してください。</li>
         </ul>
-        <br><b>録音できていることを確認できましたら、「次へ進む」ボタンを押すか、スペースキーを押してください。</b>
+        <br><b>録音できていることを確認できましたら、「次へ進む」ボタンを押してください。</b>
         <div style="margin-top: 20px;">
           <button id="start-recording" style="font-size: 16px; padding: 10px; margin: 5px;">録音開始</button>
           <button id="stop-recording" style="font-size: 16px; padding: 10px; margin: 5px;" disabled>録音完了</button>
@@ -164,10 +164,10 @@
         </div>
         <p id="recording-status" style="margin-top: 20px; font-weight: bold; color: green;">録音を開始するには「録音開始」を押してください。</p>
       `,
-      choices: [' '], // スペースキーで進行可能
       on_load: function() {
         let mediaRecorder;
         let audioChunks = [];
+        let stream;
 
         const startButton = document.getElementById('start-recording');
         const stopButton = document.getElementById('stop-recording');
@@ -175,9 +175,10 @@
         const nextButton = document.getElementById('next-button');
         const statusText = document.getElementById('recording-status');
 
-        // 録音初期化
+        // マイクアクセスの初期化
         navigator.mediaDevices.getUserMedia({ audio: true })
-          .then((stream) => {
+          .then((audioStream) => {
+            stream = audioStream;
             mediaRecorder = new MediaRecorder(stream);
 
             // 録音データ収集
@@ -200,9 +201,10 @@
               // 次の試行に進むボタンを有効化
               nextButton.style.display = 'block';
               nextButton.onclick = () => {
+                // マイクリソースの解放
+                stream.getTracks().forEach(track => track.stop());
                 jsPsych.finishTrial({ audio: audioBlob });
               };
-
             };
           })
           .catch((error) => {
@@ -225,7 +227,16 @@
           startButton.disabled = false;
           stopButton.disabled = true;
         };
+
+        // スペースキーによる次の試行進行を無効にする
+        document.addEventListener('keydown', function(event) {
+          if (event.key === ' ') {
+            event.preventDefault(); // スペースキーによる進行を無効化
+          }
+        });
       },
+      // ここでchoicesは削除し、ボタンのみで操作可能に
+      choices: [] // スペースキーで進めないようにchoicesを空に設定
     };
 
     // 練習試行：教示
@@ -589,14 +600,15 @@
     //記憶テスト試行：操作
     const testTrial = {
       type: jsPsychHtmlAudioResponse,
-      stimulus:  `
-        <div style="text-align: left;">
-          <p>先ほど聞いた単語を、</p>
-          <p>できるかぎりたくさん思い出してください。</p>
-        </div>
-      `,
-      recording_duration: 10000,
-      allow_playback: false
+      stimulus: "<p>テスト録音を開始します。</p>", // 表示されるテキスト
+      recording_duration: 10000, // 10秒間録音
+      prompt: "<p>録音中です...</p>", // 録音中のメッセージ
+      save_audio: true, // 録音データを保存
+      filename: `test_recording_${jsPsych.randomization.randomID(8)}.wav`, // 保存するファイル名
+      on_finish: function(data) {
+        console.log('録音が完了しました:', data.audio); // 録音データをコンソールで表示
+      },
+      post_trial_gap: 500, // 試行終了後のギャップ（500ms）
     };
 
     // ファイル名としてsubject_idを使用
