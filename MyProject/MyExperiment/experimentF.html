@@ -599,16 +599,47 @@
 
     //記憶テスト試行：操作
     const testTrial = {
-      type: jsPsychHtmlAudioResponse,
+      type: "html-keyboard-response", // ボタン操作は使わず自動で進行
       stimulus: "<p>テスト録音を開始します。</p>", // 表示されるテキスト
-      recording_duration: 10000, // 10秒間録音
-      prompt: "<p>録音中です...</p>", // 録音中のメッセージ
-      save_audio: true, // 録音データを保存
-      filename: `test_recording_${jsPsych.randomization.randomID(8)}.wav`, // 保存するファイル名
-      on_finish: function(data) {
-        console.log('録音が完了しました:', data.audio); // 録音データをコンソールで表示
+      choices: jsPsych.NO_KEYS, // キー入力は無効にする
+      on_load: function() {
+        let mediaRecorder;
+        let audioChunks = [];
+        let stream;
+
+        // 10分間録音
+        const recordingDuration = 10000; // 10分
+
+        // マイクアクセスの初期化
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then((audioStream) => {
+            stream = audioStream;
+            mediaRecorder = new MediaRecorder(stream);
+
+            // 録音データ収集
+            mediaRecorder.ondataavailable = (event) => {
+              audioChunks.push(event.data);
+            };
+
+            // 録音停止後の処理
+            mediaRecorder.onstop = () => {
+              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+              jsPsych.finishTrial({ audio: audioBlob }); // 録音データを試行終了時に保存
+            };
+
+            // 録音を開始
+            mediaRecorder.start();
+
+            // 指定時間後に録音を停止
+            setTimeout(() => {
+              mediaRecorder.stop();
+            }, recordingDuration);
+          })
+          .catch((error) => {
+            console.error("マイクにアクセスできませんでした。", error);
+          });
       },
-      post_trial_gap: 500, // 試行終了後のギャップ（500ms）
+      post_trial_gap: 500, // 試行終了後に0.5秒の間隔を設定
     };
 
     // ファイル名としてsubject_idを使用
