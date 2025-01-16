@@ -599,9 +599,9 @@
 
     //記憶テスト試行：操作
     const testTrial = {
-      type: "html-keyboard-response", // ボタン操作は使わず自動で進行
+      type: jsPsychHtmlKeyboardResponse, // ボタン操作は使わず自動で進行
       stimulus: "<p>テスト録音を開始します。</p>", // 表示されるテキスト
-      choices: jsPsych.NO_KEYS, // キー入力は無効にする
+      choices: "NO_KEYS", // キー入力は無効にする
       on_load: function() {
         let mediaRecorder;
         let audioChunks = [];
