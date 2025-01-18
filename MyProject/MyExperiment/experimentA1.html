@@ -459,7 +459,7 @@
         </p>
         <p style="text-align: left;">
           <b>留意事項２:</b><br>
-          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に</span>回答してください。
+          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に</span>答えてください。
         </p>
         <p style="text-align: left; margin-top: 20px;">
           <b>上記の内容について理解できましたら、スペースキーを押してください（記憶テスト試行へ）</b>
@@ -470,47 +470,16 @@
 
     //記憶テスト試行：操作
     const testTrial = {
-      type: jsPsychHtmlKeyboardResponse, // ボタン操作は使わず自動で進行
-      stimulus: "<p>テスト録音を開始します。</p>", // 表示されるテキスト
-      choices: "NO_KEYS", // キー入力は無効にする
-      on_load: function() {
-        let mediaRecorder;
-        let audioChunks = [];
-        let stream;
-
-        // 10分間録音
-        const recordingDuration = 10000; // 10分
-
-        // マイクアクセスの初期化
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then((audioStream) => {
-            stream = audioStream;
-            mediaRecorder = new MediaRecorder(stream);
-
-            // 録音データ収集
-            mediaRecorder.ondataavailable = (event) => {
-              audioChunks.push(event.data);
-            };
-
-            // 録音停止後の処理
-            mediaRecorder.onstop = () => {
-              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-              jsPsych.finishTrial({ audio: audioBlob }); // 録音データを試行終了時に保存
-            };
-
-            // 録音を開始
-            mediaRecorder.start();
-
-            // 指定時間後に録音を停止
-            setTimeout(() => {
-              mediaRecorder.stop();
-            }, recordingDuration);
-          })
-          .catch((error) => {
-            console.error("マイクにアクセスできませんでした。", error);
-          });
-      },
-      post_trial_gap: 500, // 試行終了後に0.5秒の間隔を設定
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>録音中・・・</h1>
+        <p style="text-align: left;">
+          先ほど聞いた単語を、<br>
+          できるかぎりたくさん発音してください。<br>
+        </p>
+      `,
+      choices: "NO_KEYS",
+      trial_duration: 10000, // 1分表示
     };
 
     // ファイル名としてsubject_idを使用
@@ -579,8 +548,6 @@
       enterFullscreen,      // フルスクリーン
       volumeInstruction,    // 音量調整：教示
       volumeAdjustment,     // 音量調整：操作
-      micInstruction,       // マイクテスト：教示
-      micTest,              // マイクテスト：操作
       practiceInstruction,  // 練習試行：教示
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
