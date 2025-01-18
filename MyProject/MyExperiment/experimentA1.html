@@ -200,7 +200,7 @@
             button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
-            button.style.margin = "0 10px";  // ボタン間に左右15pxの間隔を追加
+            button.style.margin = "0 20px";  // ボタン間に左右15pxの間隔を追加
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -325,11 +325,7 @@
           </div>
         `,
         prompt: `
-          <div style="display: flex; align-items: center; justify-content: center;">
-            <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
-            <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
-            <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
-          </div>
+          <div id="custom-button-container" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;"></div>
         `,
         choices: [], // デフォルトのボタン生成を無効化
         on_load: function () {
@@ -347,8 +343,7 @@
             button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
-            button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "25px";  // ボタンを左に25px移動
+            button.style.margin = "0 20px";  // ボタン間に左右15pxの間隔を追加
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -362,9 +357,13 @@
             buttons.forEach(button => {
               button.disabled = false; // 音声終了後にボタンを有効化
             });
+            
+            // 5秒後にタイムアウト試行を終了
+            jsPsych.pluginAPI.setTimeout(() => {
+              jsPsych.finishTrial({ response: null });
+            }, 5000); // 5000ms（5秒間）設定
           };
         },
-        trial_duration: 5000, // 回答時間を5秒に設定
         response_ends_trial: true, // ボタン押下で試行終了
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
@@ -373,58 +372,31 @@
           time_out: null, // 時間切れかどうかの情報（デフォルトはnull）
         },
         on_finish: function(data) {
-          // ボタンが押されたかどうかの結果を追加
-          if (data.response === null) {
-            data.time_out = true; // タイムアウトのフラグを追加
-          } else {
-            data.time_out = false; // ボタンが押された場合はタイムアウトではない
-          }
-        },
+          // ボタンが押されたかどうかの結果を記録
+          data.time_out = data.response === null; // タイムアウトのフラグを設定
+        }
       });
 
       // timeoutMessageを試行ごとに表示する
-      var mainTimeoutMessage = {
-        timeline: [
-          mainTrials[index - 6], // 実際の試行
-          {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: function() {
-              // もしresponseがnullなら時間切れ、それ以外ならOK
-              if (jsPsych.data.get().last(1).values()[0].response === null) {
-                return `
-                  <div style="text-align: center; font-size: 24px; color: red;">
-                    時間切れ<br>（5秒以内に回答してください）
-                  </div>
-                `;
-              } else {
-                return `
-                  <div style="text-align: center; font-size: 24px; color: green;">
-                   OK
-                  </div>
-                `;
-              }
-            },
-            choices: "NO_KEYS",
-            trial_duration: 1000, // 1秒間表示
-          },
-          mainFixation, // 注視点
-        ],
-      };
+      mainTrials.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function () {
+          const lastTrial = jsPsych.data.get().last(1).values()[0];
+          return lastTrial.response === null
+            ? `<div style="text-align: center; font-size: 24px; color: red;">時間切れ<br>（5秒以内に回答してください）</div>`
+            : `<div style="text-align: center; font-size: 24px; color: green;">OK</div>`;
+        },
+        choices: "NO_KEYS",
+        trial_duration: 1000, // 1秒間表示
+      });
 
-      mainTrials[index - 6] = mainTimeoutMessage; // 試行を更新
-    }
+      // 注視点を挿入
+      mainTrials.push(mainFixation);
+     }
 
-    // 注視点と音声試行を組み合わせる
+    // 練習試行全体の手続き
     var mainProcedure = {
-      timeline: [mainFixation].concat(mainTrials), // 配列を結合
-    };
-
-    // ダミー試行（白紙画面を挿入）
-    const dummyTrial = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: '', // 白紙画面
-      choices: "NO_KEYS", // キー入力を無効化
-      trial_duration: 100 // 100ms表示
+      timeline: mainTrials,
     };
 
     // 記憶テスト試行：教示
@@ -535,7 +507,6 @@
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
       mainProcedure,        // 本試行：操作
-      dummyTrial,           // ダミー試行
       testInstruction,      // 記憶テスト試行：教示
       testTrial,            // 記憶テスト試行：操作
       showCode,             // 終了時のコード提示
