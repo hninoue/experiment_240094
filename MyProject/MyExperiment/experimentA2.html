@@ -466,18 +466,40 @@
 
     //記憶テスト試行：操作
     const testTrial = {
+      const testTrial = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <h1>録音中・・・</h1>
-        <p style="text-align: left;">
-          先ほど聞いた単語を、<br>
-          できるかぎりたくさん発音してください。<br>
-        </p>
-        <br><br>
-        <b>ギブアップする場合は、スペースキーを押してください</b>
-      `,
+      stimulus: function () {
+        // 残り時間を動的に更新するHTMLを含むテンプレート
+        return `
+          <h1>録音中・・・</h1>
+          <p style="text-align: left;">
+            先ほど聞いた単語を、<br>
+            できるかぎりたくさん、声に出してお答えください。<br>
+          </p>
+          <p>残り時間: <span id="remaining-time">10:00</span></p>
+          <br><br>
+          <b>ギブアップする場合は、スペースキーを押してください</b>
+        `;
+      },
       choices: [' '],
       trial_duration: 600000, // 10分間
+      on_load: function () {
+        const totalTime = 600; // 秒単位（10分 = 600秒）
+        let timeLeft = totalTime;
+
+        // 残り時間を1秒ごとに更新
+        const interval = setInterval(() => {
+          if (timeLeft > 0) {
+            timeLeft -= 1;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('remaining-time').textContent = formattedTime;
+          } else {
+            clearInterval(interval); // タイマー終了
+          }
+        }, 1000);
+      },
     };
 
     // ファイル名としてsubject_idを使用
