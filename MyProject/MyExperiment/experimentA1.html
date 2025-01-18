@@ -6,12 +6,9 @@
     <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-initialize-microphone@1.0.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-audio-response@1.0.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-audio-button-response@1.2.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
     <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
   </head>
@@ -66,7 +63,7 @@
       type: jsPsychFullscreen,
       fullscreen_mode: true,
       message: `
-        <h1>本実験の進め方について</h1>
+        <h1>はじめに</h1>
         <style>
           ul, li {
             text-align: left;
@@ -85,7 +82,7 @@
     var volumeInstruction = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <h1>事前準備１</h1>
+        <h1>事前準備</h1>
         <p>これから実験の準備を始めます。</p>
         <style>
           ul, li {
@@ -114,129 +111,6 @@
       `,
       choices: [' '],
       trial_ends_after_audio: false, // 音声が再生されても試行が終了しない
-    };
-
-    // マイク初期化：教示
-    var micInstruction = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <h1>事前準備２</h1>
-        <p>本実験ではマイクを使います。</p>
-        <div style="text-align: left;">
-            <p>スペースキーを押した後に、マイクの使用許可を求めるダイアログが表示されます。</p>
-            <p><span style="font-size: 24px; font-weight: bold;">ダイアログが表示されたら、「許可」を選択してください。</span></p>
-        </div>
-        <br><br><b>上記の内容について理解できましたら、スペースキーを押してください</b>
-      `,
-      choices: [' ']
-    };
-
-    // マイク初期化：操作
-    var micSetting = {
-      type: jsPsychInitializeMicrophone,
-      device_select_message: `「許可」を選択できたら、「続ける」ボタンを押してください。`,
-      button_label: "続ける",
-    };
-
-    // マイクテストフェイズ
-    var micTest = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <h1>マイクテスト</h1>
-        <p>「けんとうし」と発音してください。</p>
-        <style>
-          ul, li {
-            text-align: left;
-          }
-        </style>
-        <ul>
-            <li><b>手順１</b><br>「録音開始」ボタンを押してください。</li>
-            <li><b>手順２</b><br>「けんとうし」と発音してください。</li>
-            <li><b>手順３</b><br>「録音完了」ボタンを押してください。</li>
-            <li><b>手順４</b><br>「録音再生」ボタンを押して、正確に録音できているか確認してください。</li>
-        </ul>
-        <br><b>録音できていることを確認できましたら、「次へ進む」ボタンを押してください。</b>
-        <div style="margin-top: 20px;">
-          <button id="start-recording" style="font-size: 16px; padding: 10px; margin: 5px;">録音開始</button>
-          <button id="stop-recording" style="font-size: 16px; padding: 10px; margin: 5px;" disabled>録音完了</button>
-          <button id="play-recording" style="font-size: 16px; padding: 10px; margin: 5px;" disabled>録音再生</button>
-          <button id="next-button" style="font-size: 16px; padding: 10px; margin: 20px; display: none;">次へ進む</button>
-        </div>
-        <p id="recording-status" style="margin-top: 20px; font-weight: bold; color: green;">録音を開始するには「録音開始」を押してください。</p>
-      `,
-      on_load: function() {
-        let mediaRecorder;
-        let audioChunks = [];
-        let stream;
-
-        const startButton = document.getElementById('start-recording');
-        const stopButton = document.getElementById('stop-recording');
-        const playButton = document.getElementById('play-recording');
-        const nextButton = document.getElementById('next-button');
-        const statusText = document.getElementById('recording-status');
-
-        // マイクアクセスの初期化
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then((audioStream) => {
-            stream = audioStream;
-            mediaRecorder = new MediaRecorder(stream);
-
-            // 録音データ収集
-            mediaRecorder.ondataavailable = (event) => {
-              audioChunks.push(event.data);
-            };
-
-            // 録音停止時に再生ボタンを有効化
-            mediaRecorder.onstop = () => {
-              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-              const audioUrl = URL.createObjectURL(audioBlob);
-              const audio = new Audio(audioUrl);
-
-              // 再生ボタンで録音を再生
-              playButton.disabled = false;
-              playButton.onclick = () => {
-                audio.play();
-              };
-
-              // 次の試行に進むボタンを有効化
-              nextButton.style.display = 'block';
-              nextButton.onclick = () => {
-                // マイクリソースの解放
-                stream.getTracks().forEach(track => track.stop());
-                jsPsych.finishTrial({ audio: audioBlob });
-              };
-            };
-          })
-          .catch((error) => {
-            statusText.textContent = "マイクにアクセスできませんでした。ブラウザの設定を確認してください。";
-          });
-
-        // 録音開始ボタンの動作
-        startButton.onclick = () => {
-          audioChunks = []; // 前回の録音データをクリア
-          mediaRecorder.start();
-          statusText.textContent = "録音中です。録音を停止するには「録音完了」を押してください。";
-          startButton.disabled = true;
-          stopButton.disabled = false;
-        };
-
-        // 録音停止ボタンの動作
-        stopButton.onclick = () => {
-          mediaRecorder.stop();
-          statusText.textContent = "録音を停止しました。録音を再生して確認してください。";
-          startButton.disabled = false;
-          stopButton.disabled = true;
-        };
-
-        // スペースキーによる次の試行進行を無効にする
-        document.addEventListener('keydown', function(event) {
-          if (event.key === ' ') {
-            event.preventDefault(); // スペースキーによる進行を無効化
-          }
-        });
-      },
-      // ここでchoicesは削除し、ボタンのみで操作可能に
-      choices: [] // スペースキーで進めないようにchoicesを空に設定
     };
 
     // 練習試行：教示
@@ -308,11 +182,7 @@
           </div>
         `,
         prompt: `
-          <div style="display: flex; align-items: center; justify-content: center;">
-            <span style="margin-right: 20px; font-weight: bold;">当てはまらない</span>
-            <div id="custom-button-container" style="display: flex; gap: 10px;"></div>
-            <span style="margin-left: 20px; font-weight: bold;">当てはまる</span>
-          </div>
+          <div id="custom-button-container" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;"></div>
         `,
         choices: [], // デフォルトのボタン生成を無効化
         on_load: function () {
@@ -331,7 +201,6 @@
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
             button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
-            button.style.marginLeft = "25px";  // ボタンを左25px移動
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -345,9 +214,11 @@
             buttons.forEach(button => {
               button.disabled = false; // 音声終了後にボタンを有効化
             });
+            setTimeout(() => {
+              jsPsych.finishTrial({ response: null }); // 回答時間終了後に試行を終了
+            }, 5000); // 音声終了から5秒間の回答時間を設定
           };
         },
-        trial_duration: 5000, // 回答時間を5秒に設定
         response_ends_trial: true, // ボタン押下で試行終了
         data: {
           audio_file: audioData[index].file, // 提示された音声ファイル名を記録
