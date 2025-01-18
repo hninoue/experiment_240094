@@ -436,21 +436,6 @@
       timeline: mainTrials,
     };
 
-    //ZoomのマイクON：教示
-    const micOn = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
-        <h1>お願い</h1>
-        <p style="text-align: left;">
-          ここから録音を始めますので、<br>
-          ZoomのマイクをONにしてください。<br>
-        </p>
-        <br><br>
-        <b>実験者の指示でスペースキーを押してください</b>
-      `,
-      choices: [' '],
-    };
-
     // 記憶テスト試行：教示
     const testInstruction = {
       type: jsPsychHtmlKeyboardResponse,
@@ -565,7 +550,6 @@
       practiceProcedure,    // 練習試行：操作
       mainInstruction,      // 本試行：教示
       mainProcedure,        // 本試行：操作
-      micOn,                // ZoomのマイクON：教示
       testInstruction,      // 記憶テスト試行：教示
       testTrial,            // 記憶テスト試行：操作
       showCode,             // 終了時のコード提示
