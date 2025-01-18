@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>実験_井上</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+  <script>
+    const jsPsych = initJsPsych();
+
+    // 音声データリスト
+    var audioData = [
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word000_adjustment.mp3", word: 'けんとうし', prosody: '音量調整' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word001_practice.mp3", word: 'むいちもん', prosody: '回答練習' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word002_practice.mp3", word: 'みかいけつ', prosody: '回答練習' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word003_practice.mp3", word: 'ついしけん', prosody: '回答練習' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word004_practice.mp3", word: 'ふかくてい', prosody: '回答練習' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word005_pbuffer.mp3", word: 'うんまかせ', prosody: '初頭緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word006_pbuffer.mp3", word: 'はやおくり', prosody: '初頭緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word007_pbuffer.mp3", word: 'ひとさらい', prosody: '初頭緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word008_pbuffer.mp3", word: 'ていしせい', prosody: '初頭緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word048_up.mp3", word: 'なかなおり', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word047_no.mp3", word: 'きんみらい', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word046_no.mp3", word: 'かねもうけ', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word045_up.mp3", word: 'むせいらん', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word044_no.mp3", word: 'おおみそか', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word043_no.mp3", word: 'きそゆうよ', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word042_up.mp3", word: 'つなわたり', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word041_up.mp3", word: 'ひこうしき', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word040_no.mp3", word: 'くさむしり', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word039_up.mp3", word: 'みせいねん', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word038_no.mp3", word: 'しうんてん', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word037_up.mp3", word: 'やまおとこ', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word036_no.mp3", word: 'たまひろい', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word035_up.mp3", word: 'すなあらし', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word034_up.mp3", word: 'はかまいり', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word033_no.mp3", word: 'あめおんな', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word032_up.mp3", word: 'ひるやすみ', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word031_no.mp3", word: 'さんかいき', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word030_up.mp3", word: 'しんきろう', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word029_no.mp3", word: 'たねあかし', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word028_no.mp3", word: 'ししんけい', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word027_up.mp3", word: 'てれかくし', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word026_no.mp3", word: 'からまわり', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word025_up.mp3", word: 'にもうさく', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word024_no.mp3", word: 'そらもよう', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word023_no.mp3", word: 'おにやんま', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word022_up.mp3", word: 'ゆめまくら', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word021_up.mp3", word: 'むせきにん', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word020_no.mp3", word: 'こうはんい', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word019_no.mp3", word: 'うちいわい', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word018_up.mp3", word: 'たこうしき', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word017_up.mp3", word: 'ふくさよう', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word016_no.mp3", word: 'かたおもい', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word015_up.mp3", word: 'てつあれい', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word014_no.mp3", word: 'かものはし', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word013_up.mp3", word: 'はえたたき', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word012_up.mp3", word: 'やけのはら', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word011_no.mp3", word: 'いしあたま', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word010_no.mp3", word: 'くらやしき', prosody: '抑揚なし' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word009_up.mp3", word: 'ひなまつり', prosody: '抑揚あり' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word049_rbuffer.mp3", word: 'まてんろう', prosody: '新近緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word050_rbuffer.mp3", word: 'いろなおし', prosody: '新近緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word051_rbuffer.mp3", word: 'ものわすれ', prosody: '新近緩衝' },
+      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word052_rbuffer.mp3", word: 'ひとつまみ', prosody: '新近緩衝' },
+    ];
+
+    // プリロード設定
+    var preload = {
+      type: jsPsychPreload,
+      audio: audioData.map(item => item.file), // 音量調整および本試行の全音声ファイルをプリロード
+      images: ["https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png"]
+    };
+
+    // ブラウザーチェック
+    var browserCheck = {
+      type: jsPsychBrowserCheck,
+      inclusion_function: (data) => {
+        return data.browser == 'chrome' && data.mobile === false
+      },
+      exclusion_message: (data) => {
+        if (data.mobile) {
+          return '<p>この実験はパソコンでしか参加できません。</p>';
+        } else if (data.browser !== 'chrome') {
+          return '<p>この実験はGoogle Chromeからでしか参加できません。</p>'
+        }
+      }
+    };
+
+    // フルスクリーン
+    var enterFullscreen = {
+      type: jsPsychFullscreen,
+      fullscreen_mode: true,
+      message: `
+        <h1>はじめに</h1>
+        <style>
+          ul, li {
+            text-align: left;
+          }
+        </style>
+        <ul>
+            <li><b>お願い１</b><br>この画面は、Google Chromeで開いてください。</li>
+            <li><b>お願い２</b><br>これ以降は、ブラウザの「戻る」ボタンは押さないでください。</li>
+        </ul>
+        <br><br><b>上記の内容について理解できましたら、「続ける」ボタンをクリックしてください</b>
+        `,
+      button_label: "続ける"
+    };
+
+    // 音量調整：教示
+    var volumeInstruction = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>事前準備</h1>
+        <p>これから実験の準備を始めます。</p>
+        <style>
+          ul, li {
+            text-align: left;
+          }
+        </style>
+        <ul>
+            <li><b>お願い１</b><br>パソコン以外の機器の電源をOFFにして雑音が聞こえないようにしてください。</li>
+            <li><b>お願い２</b><br>１人きりになれる静かな環境に移動してください。</li>
+            <li><b>お願い３</b><br>ヘッドフォンまたはイヤフォンを装着してください。</li>
+            <li><b>お願い４</b><br>次画面においてテスト音声が流れますので、聞こえやすい音量に調整してください。</li>
+        </ul>
+        <br><br><b>上記の内容について準備できましたら、スペースキーを押してください</b>
+      `,
+      choices: [' ']
+    };
+
+    // 音量調整：操作
+    var volumeAdjustment = {
+      type: jsPsychAudioKeyboardResponse,
+      stimulus: audioData[0].file, // 音声データリストの1番目を指定
+      prompt: `
+        <h1>音量調整</h1>
+        <p>聞こえやすい音量に調整してください。</p>
+        <br><br><b>上記の内容について準備できましたら、スペースキーを押してください</b>
+      `,
+      choices: [' '],
+      trial_ends_after_audio: false, // 音声が再生されても試行が終了しない
+    };
+
+    // 練習試行：教示
+    const practiceInstruction = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>練習試行（4試行）</h1>
+        <p style="text-align: left;">
+          画面中央に「+」が提示されます。<br>
+          <span style="font-weight: bold;">「+」の提示後に読み上げられる単語を、</span><br>
+          <span style="font-weight: bold; color: #FF5722;">この後の記憶テストに備えて覚えてください。</span>
+        </p>
+        <p style="text-align: left;">
+          単語の読み上げが終わり、画面が切り替わりましたら、<br>
+          <span style="font-weight: bold;">「この後の記憶テストで思い出せる」に当てはまる程度を、<br>
+          「1:当てはまらない」から「6:当てはまる」の6段階で判断してください。</span>
+        </p>
+        <style>
+          ul, li {
+            text-align: left;
+          }
+        </style>
+        <ul>
+          <li>
+            <b>留意事項１:</b><br>
+            <span style="color: #D5006C;">思い出せそうである場合</span>は
+            <span style="color: #D5006C;">大きい数字</span>を選択してください。<br>
+            <span style="color: #0277BD;">思い出せそうでない場合</span>は
+            <span style="color: #0277BD;">小さい数字</span>を選択してください。
+          </li>
+          <li>
+            <b>留意事項２:</b><br>
+            <span style="color: #FF5722;">5秒以内に</span>、「1」から「6」のうち該当する1つをクリックしてください。<br>
+            なお、5秒以内に選択できれば「<span style="color: green;">OK</span>」、そうでなければ「<span style="color: red;">時間切れ</span>」と表示されます。
+          </li>
+        </ul>
+        <br><br>
+        <b>上記の内容について理解できましたら、スペースキーを押してください（練習試行へ）</b>
+      `,
+      choices: [' ']
+    };
+
+    // 練習試行：注視点
+    var practiceFixation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: "NO_KEYS",
+      trial_duration: 500, // 500ms表示
+    };
+
+    // 練習試行：操作
+    var practiceTrials = [];
+    for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
+      // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
+      practiceTrials.push({
+        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        stimulus: `
+          <div>
+            <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
+            <p style="text-align: left;">
+              読み上げられた単語について、<br>
+              <span style="font-size: 24px; font-weight: bold;">「後の記憶テストで思い出せる」に当てはまる程度</span>を選んでください。
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+                  alt="数直線" 
+                  style="max-width: 80%; height: auto;">
+            </div>
+          </div>
+        `,
+        prompt: `
+          <div id="custom-button-container" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;"></div>
+        `,
+        choices: [], // デフォルトのボタン生成を無効化
+        on_load: function () {
+          const audioPlayer = document.getElementById('audio-player');
+          const buttonContainer = document.getElementById("custom-button-container");
+          const buttons = [];
+
+          // ボタンを作成してボタンを無効化
+          for (let i = 0; i < 6; i++) {
+            const button = document.createElement("button");
+            button.classList.add("jspsych-btn");
+            button.innerText = i + 1; // ボタンに番号を表示
+            button.dataset.choice = i; // 選択値を設定
+            button.style.fontSize = "24px"; // 文字サイズを大きく
+            button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
+            button.style.width = "80px"; // ボタンの幅を設定
+            button.style.height = "80px"; // ボタンの高さを設定
+            button.style.margin = "0 15px";  // ボタン間に左右7.5pxの間隔を追加
+            button.disabled = true; // 音声が再生されるまでボタンを無効化
+            button.addEventListener("click", function () {
+              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
+            });
+            buttonContainer.appendChild(button);
+            buttons.push(button); // ボタンの参照を保持
+          }
+
+          // 音声が終了した後にボタンを有効化
+          audioPlayer.onended = function() {
+            buttons.forEach(button => {
+              button.disabled = false; // 音声終了後にボタンを有効化
+            });
+            
+            // 5秒後にタイムアウト試行を終了
+            jsPsych.pluginAPI.setTimeout(() => {
+              jsPsych.finishTrial({ response: null });
+            }, 5000); // 5000ms（5秒間）設定
+          };
+        },
+        response_ends_trial: true, // ボタン押下で試行終了
+        data: {
+          audio_file: audioData[index].file, // 提示された音声ファイル名を記録
+          word: audioData[index].word, // 単語情報
+          prosody: audioData[index].prosody, // 抑揚情報
+          time_out: null, // 時間切れかどうかの情報（デフォルトはnull）
+        },
+        on_finish: function(data) {
+          // ボタンが押されたかどうかの結果を記録
+          data.time_out = data.response === null; // タイムアウトのフラグを設定
+        }
+      });
+
+      // timeoutMessageを試行ごとに表示する
+      practiceTrials.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function () {
+          const lastTrial = jsPsych.data.get().last(1).values()[0];
+          return lastTrial.response === null
+            ? `<div style="text-align: center; font-size: 24px; color: red;">時間切れ<br>（5秒以内に回答してください）</div>`
+            : `<div style="text-align: center; font-size: 24px; color: green;">OK</div>`;
+        },
+        choices: "NO_KEYS",
+        trial_duration: 1000, // 1秒間表示
+      });
+
+      // 注視点を挿入
+      practiceTrials.push(practiceFixation);
+     }
+
+    // 練習試行全体の手続き
+    var practiceProcedure = {
+      timeline: practiceTrials,
+    };
+
+    // 本試行：教示
+    const mainInstruction = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>本試行（48試行）</h1>
+        <p style="text-align: left;">
+          画面中央に「+」が提示されます。<br>
+          <span style="font-weight: bold;">「+」の提示後に読み上げられる単語を、</span><br>
+          <span style="font-weight: bold; color: #FF5722;">この後の記憶テストに備えて覚えてください。</span>
+        </p>
+        <p style="text-align: left;">
+          単語の読み上げが終わり、画面が切り替わりましたら、<br>
+          <span style="font-weight: bold;">「この後の記憶テストで思い出せる」に当てはまる程度を、<br>
+          「1:当てはまらない」から「6:当てはまる」の6段階で判断してください。</span>
+        </p>
+        <style>
+          ul, li {
+            text-align: left;
+          }
+        </style>
+        <ul>
+          <li>
+            <b>留意事項１:</b><br>
+            <span style="color: #D5006C;">思い出せそうである場合</span>は
+            <span style="color: #D5006C;">大きい数字</span>を選択してください。<br>
+            <span style="color: #0277BD;">思い出せそうでない場合</span>は
+            <span style="color: #0277BD;">小さい数字</span>を選択してください。
+          </li>
+          <li>
+            <b>留意事項２:</b><br>
+            <span style="color: #FF5722;">5秒以内に</span>、「1」から「6」のうち該当する1つをクリックしてください。<br>
+            なお、5秒以内に選択できれば「<span style="color: green;">OK</span>」、そうでなければ「<span style="color: red;">時間切れ</span>」と表示されます。
+          </li>
+        </ul>
+        <br><br>
+        <b>上記の内容について理解できましたら、スペースキーを押してください（本試行へ）</b>
+      `,
+      choices: [' ']
+    };
+
+    // 本試行：注視点
+    var mainFixation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: "NO_KEYS",
+      trial_duration: 500, // 500ms表示
+    };
+
+    // 本試行：操作
+    var mainTrials = [];
+    for (let index = 5; index < audioData.length; index++) { // 6番目以降の音声を使用
+      // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
+      mainTrials.push({
+        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        stimulus: `
+          <div>
+            <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
+            <p style="text-align: left;">
+              読み上げられた単語について、<br>
+              <span style="font-size: 24px; font-weight: bold;">「後の記憶テストで思い出せる」に当てはまる程度</span>を選んでください。
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+              <img src="https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png" 
+                  alt="数直線" 
+                  style="max-width: 80%; height: auto;">
+            </div>
+          </div>
+        `,
+        prompt: `
+          <div id="custom-button-container" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;"></div>
+        `,
+        choices: [], // デフォルトのボタン生成を無効化
+        on_load: function () {
+          const audioPlayer = document.getElementById('audio-player');
+          const buttonContainer = document.getElementById("custom-button-container");
+          const buttons = [];
+
+          // ボタンを作成してボタンを無効化
+          for (let i = 0; i < 6; i++) {
+            const button = document.createElement("button");
+            button.classList.add("jspsych-btn");
+            button.innerText = i + 1; // ボタンに番号を表示
+            button.dataset.choice = i; // 選択値を設定
+            button.style.fontSize = "24px"; // 文字サイズを大きく
+            button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
+            button.style.width = "80px"; // ボタンの幅を設定
+            button.style.height = "80px"; // ボタンの高さを設定
+            button.style.margin = "0 15px";  // ボタン間に左右7.5pxの間隔を追加
+            button.disabled = true; // 音声が再生されるまでボタンを無効化
+            button.addEventListener("click", function () {
+              jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
+            });
+            buttonContainer.appendChild(button);
+            buttons.push(button); // ボタンの参照を保持
+          }
+
+          // 音声が終了した後にボタンを有効化
+          audioPlayer.onended = function() {
+            buttons.forEach(button => {
+              button.disabled = false; // 音声終了後にボタンを有効化
+            });
+            
+            // 5秒後にタイムアウト試行を終了
+            jsPsych.pluginAPI.setTimeout(() => {
+              jsPsych.finishTrial({ response: null });
+            }, 5000); // 5000ms（5秒間）設定
+          };
+        },
+        response_ends_trial: true, // ボタン押下で試行終了
+        data: {
+          audio_file: audioData[index].file, // 提示された音声ファイル名を記録
+          word: audioData[index].word, // 単語情報
+          prosody: audioData[index].prosody, // 抑揚情報
+          time_out: null, // 時間切れかどうかの情報（デフォルトはnull）
+        },
+        on_finish: function(data) {
+          // ボタンが押されたかどうかの結果を記録
+          data.time_out = data.response === null; // タイムアウトのフラグを設定
+        }
+      });
+
+      // timeoutMessageを試行ごとに表示する
+      mainTrials.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function () {
+          const lastTrial = jsPsych.data.get().last(1).values()[0];
+          return lastTrial.response === null
+            ? `<div style="text-align: center; font-size: 24px; color: red;">時間切れ<br>（5秒以内に回答してください）</div>`
+            : `<div style="text-align: center; font-size: 24px; color: green;">OK</div>`;
+        },
+        choices: "NO_KEYS",
+        trial_duration: 1000, // 1秒間表示
+      });
+
+      // 注視点を挿入
+      mainTrials.push(mainFixation);
+     }
+
+    // 練習試行全体の手続き
+    var mainProcedure = {
+      timeline: mainTrials,
+    };
+
+    // 記憶テスト試行：教示
+    const testInstruction = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>記憶テスト試行（10分）</h1>
+        <p style="text-align: left;">
+          先ほど聞いた単語を、<br>
+          できるかぎりたくさん思い出してください。<br>
+        </p>
+        <p style="text-align: left;">
+          <b>留意事項１:</b><br>
+          思い出した単語を<span style="color: #FF5722;">口頭</span>で答えてください。
+        </p>
+        <p style="text-align: left;">
+          <b>留意事項２:</b><br>
+          <span style="color: #FF5722;">どんな順番でもよいので、思い出した順に</span>答えてください。
+        </p>
+        <p style="text-align: left;">
+          <b>留意事項３:</b><br>
+          <span style="color: #FF5722;">実験者に聞こえるぐらいに大きな声でハキハキと</span>答えてください。
+        </p>
+        <p style="text-align: left; margin-top: 20px;">
+          <b>上記の内容について理解できましたら、スペースキーを押してください（記憶テスト試行へ）</b>
+        </p>
+      `,
+      choices: [' ']
+    };
+
+    //記憶テスト試行：操作
+    const testTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <h1>録音中・・・</h1>
+        <p style="text-align: left;">
+          先ほど聞いた単語を、<br>
+          できるかぎりたくさん発音してください。<br>
+        </p>
+        <br><br>
+        <b>ギブアップする場合は、スペースキーを押してください</b>
+      `,
+      choices: [' '],
+      trial_duration: 600000, // 10分間
+    };
+
+    // ファイル名としてsubject_idを使用
+    const subject_id = jsPsych.randomization.randomID(10);
+    const filename = `${subject_id}.csv`;
+            
+    // 終了時のコード提示
+    var showCode = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+        // subject_idをデータに追加
+        jsPsych.data.addDataToLastTrial({ subject_id: subject_id });
+
+        return `
+          <h1>実験終了</h1>
+          <p>実験にご協力くださり誠にありがとうございました。</p>
+          <style>
+            ul, li {
+              text-align: left;
+            }
+          </style>
+          <ul>
+            <li><b>お願い１:</b><br>Amazonギフト券をお送りするために、法政Gmailアドレスが必要です。</li>
+            <li><b>お願い２:</b><br>下記の英数字コードをメモ（コピー＆ペースト）してください。<br>それが困難な場合には、スクリーンショットを保存してください。</li>
+          </ul>
+          <br><br><b>英数字コード: <strong>${subject_id}</strong></b>
+          <br><br><b>コードを控えることができましたら、スペースキーを押してください</b>
+        `;
+      },
+      choices: [' ']
+    };
+
+    //データ保存
+    const save_data = {
+      type: jsPsychPipe,
+      action: "save",
+      experiment_id: "T8aEfMCgzvhC",
+      filename: filename,
+      data_string: ()=>jsPsych.data.get().csv()
+    };
+
+    // save_dataの後に表示する試行
+    var finalMessage = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p style="text-align: left;">改めまして、</p>
+        <p style="text-align: left;">実験にご協力くださり誠にありがとうございました。</p>
+        <p style="text-align: left;"><b>下記のリンクをクリックしてください。</b></p>
+        <p style="text-align: left;">＊リンクは、謝礼を送るのに必要な情報を記入していただくGoogleフォームにつながっています。</p>
+        <br><br>
+        <p style="text-align: center;">
+          <a href="https://forms.gle/zpzJ2A69Fo2G4VNL9" target="_blank" style="font-size: 18px; color: blue; text-decoration: underline;">
+            https://forms.gle/zpzJ2A69Fo2G4VNL9
+          </a>
+        </p>
+        <br><br>
+        <b>リンクを開いた後、こちらのブラウザを閉じてください。</b>
+      `,
+      choices: "NO_KEYS", // キー入力なし
+    };
+
+    // 実験の実行
+    jsPsych.run([
+      preload,              // 刺激のプリロード
+      browserCheck,         // ブラウザーチェック
+      enterFullscreen,      // フルスクリーン
+      volumeInstruction,    // 音量調整：教示
+      volumeAdjustment,     // 音量調整：操作
+      practiceInstruction,  // 練習試行：教示
+      practiceProcedure,    // 練習試行：操作
+      mainInstruction,      // 本試行：教示
+      mainProcedure,        // 本試行：操作
+      testInstruction,      // 記憶テスト試行：教示
+      testTrial,            // 記憶テスト試行：操作
+      showCode,             // 終了時のコード提示
+      save_data,            // データ保存
+      finalMessage          // 最後のメッセージ
+    ]);
+  </script>
+</html>
