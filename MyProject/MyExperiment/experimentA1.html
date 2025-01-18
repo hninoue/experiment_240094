@@ -200,7 +200,7 @@
             button.style.padding = "20px"; // ボタンのパディングを増加（大きくする）
             button.style.width = "80px"; // ボタンの幅を設定
             button.style.height = "80px"; // ボタンの高さを設定
-            button.style.margin = "0 30px";  // ボタン間に左右15pxの間隔を追加
+            button.style.margin = "0 10px";  // ボタン間に左右15pxの間隔を追加
             button.disabled = true; // 音声が再生されるまでボタンを無効化
             button.addEventListener("click", function () {
               jsPsych.finishTrial({ response: parseInt(this.dataset.choice) });
@@ -214,9 +214,11 @@
             buttons.forEach(button => {
               button.disabled = false; // 音声終了後にボタンを有効化
             });
-            setTimeout(() => {
-              jsPsych.finishTrial({ response: null }); // 回答時間終了後に試行を終了
-            }, 5000); // 音声終了から5秒間の回答時間を設定
+            
+            // 5秒後にタイムアウト試行を終了
+            jsPsych.pluginAPI.setTimeout(() => {
+              jsPsych.finishTrial({ response: null });
+            }, 5000); // 5000ms（5秒間）設定
           };
         },
         response_ends_trial: true, // ボタン押下で試行終了
@@ -227,50 +229,31 @@
           time_out: null, // 時間切れかどうかの情報（デフォルトはnull）
         },
         on_finish: function(data) {
-          // ボタンが押されたかどうかの結果を追加
-          if (data.response === null) {
-            data.time_out = true; // タイムアウトのフラグを追加
-          } else {
-            data.time_out = false; // ボタンが押された場合はタイムアウトではない
-          }
+          // ボタンが押されたかどうかの結果を記録
+          data.time_out = data.response === null; // タイムアウトのフラグを設定
         }
       });
 
       // timeoutMessageを試行ごとに表示する
-      var practiceTimeoutMessage = {
-        timeline: [
-          practiceTrials[index - 1], // 実際の試行
-          {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: function() {
-              // もしresponseがnullなら時間切れ、それ以外ならOK
-              if (jsPsych.data.get().last(1).values()[0].response === null) {
-                return `
-                  <div style="text-align: center; font-size: 24px; color: red;">
-                    時間切れ<br>（5秒以内に回答してください）
-                  </div>
-                `;
-              } else {
-                return `
-                  <div style="text-align: center; font-size: 24px; color: green;">
-                   OK
-                  </div>
-                `;
-              }
-            },
-            choices: "NO_KEYS",
-            trial_duration: 1000, // 1秒間表示
-          },
-          practiceFixation, // 注視点
-        ],
-      };
+      practiceTrials.push({
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: function () {
+          const lastTrial = jsPsych.data.get().last(1).values()[0];
+          return lastTrial.response === null
+            ? `<div style="text-align: center; font-size: 24px; color: red;">時間切れ<br>（5秒以内に回答してください）</div>`
+            : `<div style="text-align: center; font-size: 24px; color: green;">OK</div>`;
+        },
+        choices: "NO_KEYS",
+        trial_duration: 1000, // 1秒間表示
+      });
 
-      practiceTrials[index - 1] = practiceTimeoutMessage; // 試行を更新
-    }
+      // 注視点を挿入
+      practiceTrials.push(practiceFixation);
+     }
 
-    // 注視点と音声試行を組み合わせる
+    // 練習試行全体の手続き
     var practiceProcedure = {
-      timeline: [practiceFixation].concat(practiceTrials), // 配列を結合
+      timeline: practiceTrials,
     };
 
     // 本試行：教示
