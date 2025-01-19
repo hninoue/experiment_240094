@@ -97,8 +97,9 @@
 
     // フルスクリーン
     var enterFullscreen = {
-      type: jsPsychHtmlKeyboardResponse,
-      stimulus: `
+      type: jsPsychFullscreen,
+      fullscreen_mode: true,
+      message: `
         <h1>はじめに</h1>
         <style>
           ul, li {
@@ -109,15 +110,9 @@
             <li><b>お願い１</b><br>この画面は、Google Chromeで開いてください。</li>
             <li><b>お願い２</b><br>これ以降は、ブラウザの「戻る」ボタンは押さないでください。</li>
         </ul>
-        <br><br><b>上記の内容について理解できましたら、スペースキーを押してください。</b>
-      `,
-      choices: [' '], // スペースキーで進む
-      on_finish: function() {
-        // フルスクリーンモードに移行
-        if (jsPsych.extensions['fullscreen'].isFullscreen() === false) {
-          jsPsych.extensions['fullscreen'].toggle();
-        }
-      }
+        <br><br><b>上記の内容について理解できましたら、「続ける」ボタンをクリックしてください → </b>
+        `,
+      button_label: "続ける"
     };
 
     // 音量調整：教示
