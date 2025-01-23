@@ -1,0 +1,23 @@
+name: Deploy to Cognition.run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Deploy to Cognition.run
+      env:
+        COGNITION_PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      run: |
+        curl -X POST https://api.cognition.run/deploy \
+        -H "Authorization: Bearer $COGNITION_PAT" \
+        -F "repository=${{ github.repository }}" \
+        -F "branch=${{ github.ref_name }}"
