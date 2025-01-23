@@ -1,23 +1,13 @@
-name: Deploy to Cognition.run
-
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
-  deploy:
+  cognition-deploy:
     runs-on: ubuntu-latest
-
+    name: Deploy experiment to Cognition
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Deploy to Cognition.run
-      env:
-        COGNITION_PAT: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      run: |
-        curl -X POST https://api.cognition.run/deploy \
-        -H "Authorization: Bearer $COGNITION_PAT" \
-        -F "repository=${{ github.repository }}" \
-        -F "branch=${{ github.ref_name }}"
+      - uses: actions/checkout@v3
+      - uses: javidalpe/cognition-deploy-action@v1.2.0
+        id: deploy
+        with:
+          personal-access-token: ${{secrets.PERSONAL_ACCESS_TOKEN}}
+      - run: echo "The public link to the task is ${{ steps.deploy.outputs.link }}"
