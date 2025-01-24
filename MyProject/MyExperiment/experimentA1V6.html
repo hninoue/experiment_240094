@@ -1,24 +1,26 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>実験_井上</title>
-    <script src="https://unpkg.com/jspsych@7.3.4"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.1"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.2.0"></script>
-    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
-    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body></body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cognition.run Example</title>
+  <!-- jsPsych本体 -->
+  <script src="https://cognition.run/files/PROJECT_ID/jspsych.js"></script>
+  <link rel="stylesheet" href="https://cognition.run/files/PROJECT_ID/jspsych.css">
+  <!-- プラグイン -->
+  <script src="https://cognition.run/files/PROJECT_ID/jspsych-fullscreen.js"></script>
+  <script src="https://cognition.run/files/PROJECT_ID/jspsych-call-function.js"></script>
+  <script src="https://cognition.run/files/PROJECT_ID/jspsych-html-button-response.js"></script>
+  <script src="https://cognition.run/files/PROJECT_ID/jspsych-html-keyboard-response.js"></script>
+  <script src="https://cognition.run/files/PROJECT_ID/jspsych-audio-keyboard-response.js"></script>
+</head>
+<body>
   <script>
     var jsPsych = initJsPsych();
 
     // 音声データリスト
     var audioData = [
-      { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word000_adjustment.mp3", word: 'けんとうし', prosody: '音量調整' },
+      { file: "https://cognition.run/files/PROJECT_ID/word000_adjustment.mp3", word: 'けんとうし', prosody: '音量調整' },
       { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word001_practice.mp3", word: 'むいちもん', prosody: '回答練習' },
       { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word002_practice.mp3", word: 'みかいけつ', prosody: '回答練習' },
       { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word003_practice.mp3", word: 'ついしけん', prosody: '回答練習' },
@@ -73,26 +75,37 @@
       { file: "https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/word052_rbuffer.mp3", word: 'ひとつまみ', prosody: '新近緩衝' },
     ];
 
-    // プリロード設定
-    var preload = {
-      type: 'preload',
-      audio: audioData.map(function(item) { return item.file; }), // 音量調整および本試行の全音声ファイルをプリロード
-      images: ["https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png"]
-    };
+    // プリロードする音声ファイルのURLをリスト化
+    const audioFiles = audioData.map(item => item.file);
+
+    // 音声ファイルの事前読み込み
+    jsPsych.pluginAPI.preloadAudio(audioFiles, function() {
+      console.log("音声ファイルの読み込みが完了しました");
+    });
+
+
+    // 画像ファイルを事前読み込み
+    const imageFiles = [
+      "https://cognition.run/files/PROJECT_ID/image000_scale.png"
+    ];
+
+    // 画像ファイルをプリロード
+    jsPsych.pluginAPI.preloadImages(imageFiles, function() {
+      console.log("画像ファイルの読み込みが完了しました");
+    });
 
     // ブラウザーチェック
     var browserCheck = {
-      type: 'browser-check',
-      inclusion_function: function(data) {
-        return data.browser == 'chrome' && data.mobile === false;
-      },
-      exclusion_message: function(data) {
-        if (data.mobile) {
-          return '<p>この実験はパソコンでしか参加できません。</p>';
-        } else if (data.browser !== 'chrome') {
-          return '<p>この実験はGoogle Chromeからでしか参加できません。</p>';
+      type: "html-keyboard-response",
+      stimulus: function() {
+        var browser = navigator.userAgent;
+        if (browser.includes("Chrome")) {
+          return "Google Chromeでアクセスしています。スペースキーを押してください。";
+        } else {
+          return "この実験はGoogle Chromeで動作します。他のブラウザでは正確に動作しない可能性があります。";
         }
-      }
+      },
+      choices: [' ']
     };
 
     // フルスクリーン
@@ -535,13 +548,34 @@
     };
 
     //データ保存
-    const save_data = {
-      type: 'pipe',
-      action: "save",
-      experiment_id: "T8aEfMCgzvhC",
-      filename: filename,
-      data_string: function() {
-        return jsPsych.data.get().csv(); // 実験データをCSV形式で取得
+    const saveData = {
+      type: "call-function",
+      func: function() {
+        // jsPsychのデータをCSV形式で取得
+        const data = jsPsych.data.get().csv();
+
+        // データ送信のリクエストを作成
+        fetch(`https://api.cognition.run/v1/projects/${projectId}/data`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            filename: `${jsPsych.randomization.randomID(10)}.csv`, // ファイル名
+            content: data // データ内容
+          })
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log("データ保存が成功しました！");
+          } else {
+            console.error("データ保存に失敗しました。", response.status);
+          }
+        })
+        .catch(error => {
+          console.error("データ送信中にエラーが発生しました。", error);
+        });
       }
     };
 
@@ -567,7 +601,6 @@
 
     // 実験のタイムライン
     var timeline = [];
-    timeline.push(preload);
     timeline.push(browserCheck);
     timeline.push(enterFullscreen);
     timeline.push(volumeInstruction);
@@ -579,7 +612,7 @@
     timeline.push(testInstruction);
     timeline.push(testTrial);
     timeline.push(showCode);
-    timeline.push(save_data);
+    timeline.push(saveData);
     timeline.push(finalMessage);
 
     // jsPsych実行
@@ -590,4 +623,5 @@
       }
     });
   </script>
+</body>
 </html>
