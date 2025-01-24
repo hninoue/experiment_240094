@@ -14,7 +14,7 @@
   </head>
   <body></body>
   <script>
-    const jsPsych = initJsPsych();
+    var jsPsych = initJsPsych();
 
     // 音声データリスト
     var audioData = [
@@ -75,29 +75,29 @@
 
     // プリロード設定
     var preload = {
-      type: jsPsychPreload,
-      audio: audioData.map(item => item.file), // 音量調整および本試行の全音声ファイルをプリロード
+      type: 'preload',
+      audio: audioData.map(function(item) { return item.file; }), // 音量調整および本試行の全音声ファイルをプリロード
       images: ["https://raw.githubusercontent.com/hninoue/experiment_240094/main/MyProject/MyExperiment/image000_scale.png"]
     };
 
     // ブラウザーチェック
     var browserCheck = {
-      type: jsPsychBrowserCheck,
-      inclusion_function: (data) => {
-        return data.browser == 'chrome' && data.mobile === false
+      type: 'browser-check',
+      inclusion_function: function(data) {
+        return data.browser == 'chrome' && data.mobile === false;
       },
-      exclusion_message: (data) => {
+      exclusion_message: function(data) {
         if (data.mobile) {
           return '<p>この実験はパソコンでしか参加できません。</p>';
         } else if (data.browser !== 'chrome') {
-          return '<p>この実験はGoogle Chromeからでしか参加できません。</p>'
+          return '<p>この実験はGoogle Chromeからでしか参加できません。</p>';
         }
       }
     };
 
     // フルスクリーン
     var enterFullscreen = {
-      type: jsPsychFullscreen,
+      type: 'fullscreen',
       fullscreen_mode: true,
       message: `
         <h1>はじめに</h1>
@@ -117,7 +117,7 @@
 
     // 音量調整：教示
     var volumeInstruction = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: `
         <h1>事前準備</h1>
         <p>これから実験の準備を始めます。</p>
@@ -139,7 +139,7 @@
 
     // 音量調整：操作
     var volumeAdjustment = {
-      type: jsPsychAudioKeyboardResponse,
+      type: 'audio-keyboard-response',
       stimulus: audioData[0].file, // 音声データリストの1番目を指定
       prompt: `
         <h1>音量調整</h1>
@@ -147,12 +147,12 @@
         <br><br><b>上記の内容について準備できましたら、スペースキーを押してください</b>
       `,
       choices: [' '],
-      trial_ends_after_audio: false, // 音声が再生されても試行が終了しない
+      response_ends_trial: false // 音声が再生されても試行が終了しない
     };
 
     // 練習試行：教示
     const practiceInstruction = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: `
         <h1>練習試行（4試行）</h1>
         <p style="text-align: left;">
@@ -192,10 +192,10 @@
 
     // 練習試行：注視点
     var practiceFixation = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: '<div style="font-size:60px;">+</div>',
-      choices: "NO_KEYS",
-      trial_duration: 500, // 500ms表示
+      choices: jsPsych.NO_KEYS,
+      trial_duration: 500 // 500ms表示
     };
 
     // 練習試行：操作
@@ -203,7 +203,7 @@
     for (let index = 1; index < 5; index++) { // 2番目から5番目の音声を使用
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       practiceTrials.push({
-        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        type: 'html-button-response', // 一つの画面で提示
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
@@ -273,14 +273,14 @@
 
       // timeoutMessageを試行ごとに表示する
       practiceTrials.push({
-        type: jsPsychHtmlKeyboardResponse,
+        type: 'html-keyboard-response',
         stimulus: function () {
           const lastTrial = jsPsych.data.get().last(1).values()[0];
           return lastTrial.response === null
             ? `<div style="text-align: center; font-size: 24px; color: red;">時間切れ<br>（5秒以内に回答してください）</div>`
             : `<div style="text-align: center; font-size: 24px; color: green;">OK</div>`;
         },
-        choices: "NO_KEYS",
+        choices: jsPsych.NO_KEYS,
         trial_duration: 1000, // 1秒間表示
       });
 
@@ -295,7 +295,7 @@
 
     // 本試行：教示
     const mainInstruction = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: `
         <h1>本試行（48試行）</h1>
         <p style="text-align: left;">
@@ -335,9 +335,9 @@
 
     // 本試行：注視点
     var mainFixation = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: '<div style="font-size:60px;">+</div>',
-      choices: "NO_KEYS",
+      choices: jsPsych.NO_KEYS,
       trial_duration: 500, // 500ms表示
     };
 
@@ -346,7 +346,7 @@
     for (let index = 5; index < audioData.length; index++) { // 6番目以降の音声を使用
       // メインの試行（音声＋ボタン無効化 → 音声終了後にボタン有効化 → 回答）
       mainTrials.push({
-        type: jsPsychHtmlButtonResponse, // 一つの画面で提示
+        type: 'html-button-response', // 一つの画面で提示
         stimulus: `
           <div>
             <audio id="audio-player" src="${audioData[index].file}" autoplay></audio>
@@ -416,14 +416,14 @@
 
       // timeoutMessageを試行ごとに表示する
       mainTrials.push({
-        type: jsPsychHtmlKeyboardResponse,
+        type: 'html-keyboard-response',
         stimulus: function () {
           const lastTrial = jsPsych.data.get().last(1).values()[0];
           return lastTrial.response === null
             ? `<div style="text-align: center; font-size: 24px; color: red;">時間切れ<br>（5秒以内に回答してください）</div>`
             : `<div style="text-align: center; font-size: 24px; color: green;">OK</div>`;
         },
-        choices: "NO_KEYS",
+        choices: jsPsych.NO_KEYS,
         trial_duration: 1000, // 1秒間表示
       });
 
@@ -438,7 +438,7 @@
 
     // 記憶テスト試行：教示
     const testInstruction = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: `
         <h1>記憶テスト試行（10分）</h1>
         <p style="text-align: left;">
@@ -466,7 +466,7 @@
 
     //記憶テスト試行：操作
     const testTrial = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: function () {
         // 残り時間を動的に更新するHTMLを含むテンプレート
         return `
@@ -498,7 +498,10 @@
             clearInterval(interval); // タイマー終了
           }
         }, 1000);
-      },
+
+        // 試行終了時にタイマーをクリア
+        jsPsych.pluginAPI.setTimeout(() => clearInterval(interval), 600000);
+      }
     };
 
     // ファイル名としてsubject_idを使用
@@ -507,7 +510,7 @@
             
     // 終了時のコード提示
     var showCode = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: function() {
         // subject_idをデータに追加
         jsPsych.data.addDataToLastTrial({ subject_id: subject_id });
@@ -533,16 +536,18 @@
 
     //データ保存
     const save_data = {
-      type: jsPsychPipe,
+      type: 'pipe',
       action: "save",
       experiment_id: "T8aEfMCgzvhC",
       filename: filename,
-      data_string: ()=>jsPsych.data.get().csv()
+      data_string: function() {
+        return jsPsych.data.get().csv(); // 実験データをCSV形式で取得
+      }
     };
 
     // save_dataの後に表示する試行
     var finalMessage = {
-      type: jsPsychHtmlKeyboardResponse,
+      type: 'html-keyboard-response',
       stimulus: `
         <p style="text-align: left;">改めまして、</p>
         <p style="text-align: left;">実験にご協力くださり誠にありがとうございました。</p>
@@ -557,25 +562,32 @@
         <br><br>
         <b>リンクを開いた後、こちらのブラウザを閉じてください。</b>
       `,
-      choices: "NO_KEYS", // キー入力なし
+      choices: jsPsych.NO_KEYS // キー入力なし
     };
 
-    // 実験の実行
-    jsPsych.run([
-      preload,              // 刺激のプリロード
-      browserCheck,         // ブラウザーチェック
-      enterFullscreen,      // フルスクリーン
-      volumeInstruction,    // 音量調整：教示
-      volumeAdjustment,     // 音量調整：操作
-      practiceInstruction,  // 練習試行：教示
-      practiceProcedure,    // 練習試行：操作
-      mainInstruction,      // 本試行：教示
-      mainProcedure,        // 本試行：操作
-      testInstruction,      // 記憶テスト試行：教示
-      testTrial,            // 記憶テスト試行：操作
-      showCode,             // 終了時のコード提示
-      save_data,            // データ保存
-      finalMessage          // 最後のメッセージ
-    ]);
+    // 実験のタイムライン
+    var timeline = [];
+    timeline.push(preload);
+    timeline.push(browserCheck);
+    timeline.push(enterFullscreen);
+    timeline.push(volumeInstruction);
+    timeline.push(volumeAdjustment);
+    timeline.push(practiceInstruction);
+    timeline.push(practiceProcedure);
+    timeline.push(mainInstruction);
+    timeline.push(mainProcedure);
+    timeline.push(testInstruction);
+    timeline.push(testTrial);
+    timeline.push(showCode);
+    timeline.push(save_data);
+    timeline.push(finalMessage);
+
+    // jsPsych実行
+    jsPsych.init({
+      timeline: timeline,
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
   </script>
 </html>
